@@ -1,0 +1,215 @@
+/* client-report-modal.css — Styles for the Client Reports Modal */
+
+/* Reports Modal Container */
+#reportsModal .modal-body {
+  overflow-x: auto;
+}
+
+/* Filter Row */
+.reports-filter-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.reports-filter-row label {
+  margin: 0;
+  font-size: 12px;
+  color: #333;
+}
+
+.reports-filter-row select {
+  min-width: 220px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Reports Results Container */
+#reportsResults {
+  margin-top: 6px;
+}
+
+/* Reports Table */
+#reportsResultsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+#reportsResultsTable thead {
+  background: transparent;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+#reportsResultsTable th {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+#reportsResultsTable th:first-child {
+  padding: 8px 6px;
+  text-align: center;
+  width: 88px;
+}
+
+#reportsResultsTable th:nth-child(4),
+#reportsResultsTable th:nth-child(8),
+#reportsResultsTable th:nth-child(9) {
+  text-align: right;
+}
+
+#reportsResultsTable tbody td {
+  padding: 8px 10px;
+}
+
+/* Reports Table Footer */
+#reportsResultsTFoot tr {
+  border-top: 1px solid #e6e6e6;
+  background: #fafafa;
+}
+
+#reportsResultsTFoot td {
+  padding: 8px 10px;
+}
+
+#reportsResultsTFoot td:first-child {
+  padding: 8px 6px;
+}
+
+#reportsResultsTFoot td:nth-child(2) {
+  font-weight: 700;
+}
+
+#reports_total,
+#reports_paid,
+#reports_outstanding {
+  text-align: right;
+  font-weight: 700;
+}
+
+
+/* reports.css — Wider layout and overflow behaviors for reports modal */
+
+#reportsModal .modal {
+  width: 90vw;
+  max-width: 1200px;
+}
+
+#reportsModal .modal-body {
+  max-height: 80vh;
+  overflow: auto;
+}
+
+/* Allow horizontal scrolling within reports modal body */
+#reportsModal .modal-body {
+  overflow-x: auto;
+}
+
+/* Full reports modal table styling moved from css/invoice.css */
+#reportsModal select { border:1px solid var(--border-color, #e6e6e6); background: var(--bg-surface, #ffffff); color: var(--text-strong, #0f172a); }
+#reportsModal table { width: auto; min-width: 1100px; table-layout: fixed; border-collapse: collapse; font-size:13px; color: var(--text-strong, #111827); }
+#reportsModal th { font-weight:600; color: var(--text-strong, #111827); text-align:left; padding:10px 12px; border-bottom:1px solid var(--border-color, #eef2f7); }
+#reportsModal td { padding:10px 12px; border-bottom:1px solid var(--bg-muted-2, #f4f4f5); }
+
+/* Keep each results cell single-line (ellipsis) and prevent overflow */
+#reportsModal table th, #reportsModal table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: none;
+}
+
+/* Reports modal action buttons (Details / Mark Paid) */
+#reportsModal .reports-toggle,
+#reportsModal .reports-mark-paid {
+  display: inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  min-width: 0;
+  box-sizing: border-box;
+  line-height: 1;
+  flex: 0 0 36px;
+  max-width: 36px;
+  padding: 4px;
+  font-size: 14px;
+  height: 28px;
+  display:inline-flex; align-items:center; justify-content:center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#reportsModal .reports-toggle { background: var(--bg-surface, #ffffff); color: var(--text-strong, #111827); }
+#reportsModal .reports-toggle:hover { background: var(--bg-muted-2, #f3f4f6); }
+
+#reportsModal .reports-mark-paid { background: var(--success-primary, #10b981); color: var(--btn-primary-color-on, #fff); border-color: rgba(16,185,129,0.9); }
+#reportsModal .reports-mark-paid:hover { filter: brightness(0.95); }
+
+/* Action column space */
+#reportsModal table th:first-child, #reportsModal table td:first-child { width: 88px; min-width: 88px; max-width: 120px; }
+
+/* Column width helpers */
+#reportsModal table th:nth-child(2), #reportsModal table td:nth-child(2) { width: 40%; white-space: normal; padding-left: 8px; }
+#reportsModal table th:nth-child(3), #reportsModal table td:nth-child(3) { width: 12%; }
+#reportsModal table th:nth-child(4), #reportsModal table td:nth-child(4) { width: 10%; text-align:right; }
+#reportsModal table th:nth-child(5), #reportsModal table td:nth-child(5) { width: 8%; }
+#reportsModal table th:nth-child(6), #reportsModal table td:nth-child(6) { width: 8%; }
+#reportsModal table th:nth-child(7), #reportsModal table td:nth-child(7) { width: 6%; }
+#reportsModal table th:nth-child(8), #reportsModal table td:nth-child(8) { width: 8%; text-align:right; }
+#reportsModal table th:nth-child(9), #reportsModal table td:nth-child(9) { width: 8%; text-align:right; }
+
+/* Sticky footer totals row */
+#reportsModal table tfoot tr {
+  position: -webkit-sticky;
+  position: sticky;
+  bottom: 0;
+  background: #fafafa;
+  z-index: 8;
+  box-shadow: 0 -6px 10px rgba(0,0,0,0.06);
+}
+#reportsModal table tfoot td { white-space: nowrap; }
+
+/* details row and toggle */
+#reportsModal .reports-details td { padding: 6px 10px; font-size: 12px; color: #222; }
+#reportsModal .reports-toggle { padding:4px 6px; font-size:12px; border-radius:4px; border:1px solid #e5e7eb; background:white; cursor:pointer; }
+#reportsModal .reports-toggle:hover { background:#f3f4f6; }
+#reportsModal .reports-details table th, #reportsModal .reports-details table td { border-bottom: none; }
+#reportsModal .reports-details table td { padding:6px 8px; white-space: normal; overflow: visible; word-break: break-word; }
+
+/* Responsive tweaks for reports modal (moved from invoice.css) */
+@media (max-width: 768px) {
+  #reportsModal table { min-width: auto; font-size: 11px; }
+  #reportsModal th, #reportsModal td { padding: 6px 8px; }
+}
+
+@media (max-width: 480px) {
+  #reportsModal table { font-size: 10px; }
+  #reportsModal th, #reportsModal td { padding: 4px 6px; }
+}
+
+tfoot {
+  background: var(--bg-muted-2, #f4f4f5);
+  translate: 0px 21px;
+}
+
+/* Base modal content - consistent animation and styling */
+.modal-content,
+.modal,
+.duplicate-invoice-modal {
+  background: var(--bg-surface, #ffffff);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 500px;
+ /* max-height: 90vh;*/
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease;
+}

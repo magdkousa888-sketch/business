@@ -1,0 +1,823 @@
+// bundle-ui-update.js — Update and testing helpers for Bundle Manager
+(function(){
+  'use strict';
+
+  /**
+   * TESTER: Compares bundle items in the UI form with matching rows in Google Sheets
+   * Logs both the HTML table rows and the corresponding Google Sheets rows for debugging
+   */
+  async function testBundleItemsMatchWithSheet() {
+    try {
+      console.log('=== BUNDLE ITEMS TESTER ===');
+
+      // Step 1: Get current bundle from the manager
+      const curIdx = (window._bundleManagerGlobal && typeof window._bundleManagerGlobal.getCurrentBundleIndex === 'function') 
+        ? window._bundleManagerGlobal.getCurrentBundleIndex() 
+        : null;
+      
+      if (curIdx === null) {
+        console.warn('No bundle selected (currentIndex is null - you are in create mode)');
+        return;
+      }
+
+      const bundles = (window.bundleModel && typeof window.bundleModel.getBundles === 'function') 
+        ? window.bundleModel.getBundles() 
+        : (window.bundlesData || []);
+      
+      const currentBundle = bundles[curIdx];
+      
+      if (!currentBundle || !currentBundle.id) {
+        console.warn('Current bundle not found or has no ID');
+        return;
+      }
+
+      const bundleId = currentBundle.id;
+      console.log('Bundle ID:', bundleId);
+      console.log('Bundle Index:', curIdx);
+      console.log('Bundle Name:', currentBundle.bundleName);
+
+      // Step 2: Grab all <tr> elements from the bundle items table
+      const tbody = document.getElementById('bundleItemsBody');
+      if (!tbody) {
+        console.warn('Bundle items table body not found');
+        return;
+      }
+
+      const tableRows = Array.from(tbody.querySelectorAll('tr'));
+      console.log(`\nFound ${tableRows.length} rows in HTML table:`);
+      
+      const htmlItems = tableRows.map((tr, index) => {
+        const nameInput = tr.querySelector('.bundle-item-name');
+        const qtyInput = tr.querySelector('.bundle-item-qty');
+        const priceInput = tr.querySelector('.bundle-item-price');
+        const totalCell = tr.querySelector('.bundle-item-total');
+        
+        return {
+          rowIndex: index,
+          name: nameInput ? nameInput.value.trim() : '',
+          qty: qtyInput ? parseFloat(qtyInput.value) || 0 : 0,
+          price: priceInput ? parseFloat(priceInput.value) || 0 : 0,
+          total: totalCell ? totalCell.textContent.trim() : '0.00'
+        };
+      });
+
+      console.table(htmlItems);
+
+      // Step 3: Load Google Sheets data
+      const SPREADSHEET_ID = window.GOOGLE_SPREADSHEET_ID || '17gh8MZSeFVPQudyTGwYf5_pFWH8yt-xpCPiPy9i8x-U';
+      const SHEET_NAME = window.BUNDLES_SHEET_NAME || 'Bundles';
+      const RANGE = `${SHEET_NAME}!A1:Z`;
+      
+      let sheetData = null;
+
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}`;
+        const response = await window.ServiceAccountAuth.fetch(url);
+        if (!response.ok) throw new Error(`Failed to load sheet data (${response.status})`);
+        const json = await response.json();
+        sheetData = json.values || [];
+      } else if (window.googleSheetsClient && typeof window.googleSheetsClient.loadRange === 'function') {
+        sheetData = await window.googleSheetsClient.loadRange(RANGE);
+      } else {
+        console.warn('No Google Sheets client available');
+        return;
+      }
+
+      if (!sheetData || sheetData.length < 2) {
+        console.warn('Sheet has no data');
+        return;
+      }
+
+      // Step 4: Parse sheet headers
+      const headerRow = sheetData[0];
+      const colMap = {};
+      headerRow.forEach((col, idx) => {
+        const normalized = String(col || '').trim().toLowerCase();
+        colMap[normalized] = idx;
+      });
+
+      const bundleIdCol = colMap['bundle id'] ?? colMap['bundleid'];
+      const itemNameCol = colMap['bundle item'] ?? colMap['bundleitem'];
+      const qtyCol = colMap['item quantity'] ?? colMap['itemquantity'];
+      const priceCol = colMap['item price'] ?? colMap['itemprice'];
+
+      console.log('\nColumn mapping:', {
+        bundleIdCol,
+        itemNameCol,
+        qtyCol,
+        priceCol
+      });
+
+      // Step 5: Find matching rows in Google Sheets
+      const bundleIdNorm = String(bundleId || '').trim().toLowerCase();
+      const matchingSheetRows = [];
+
+      for (let i = 1; i < sheetData.length; i++) {
+        const row = sheetData[i];
+        const cellBundleId = String(row[bundleIdCol] || '').trim().toLowerCase();
+        
+        if (cellBundleId === bundleIdNorm) {
+          matchingSheetRows.push({
+            sheetRowIndex: i,
+            sheetRowNumber: i + 1,
+            bundleId: row[bundleIdCol] || '',
+            itemName: itemNameCol !== undefined ? (row[itemNameCol] || '') : '',
+            qty: qtyCol !== undefined ? (parseFloat(row[qtyCol]) || 0) : 0,
+            price: priceCol !== undefined ? (parseFloat(row[priceCol]) || 0) : 0,
+            rawRow: row
+          });
+        }
+      }
+
+      console.log(`\nFound ${matchingSheetRows.length} matching rows in Google Sheets:`);
+      console.table(matchingSheetRows.map(r => ({
+        rowNumber: r.sheetRowNumber,
+        itemName: r.itemName,
+        qty: r.qty,
+        price: r.price
+      })));
+
+      // Step 6: Compare HTML items vs Sheet items
+      console.log('\n=== COMPARISON ===');
+      console.log('HTML items count:', htmlItems.length);
+      console.log('Sheet rows count:', matchingSheetRows.length);
+
+      // Match by item name
+      htmlItems.forEach((htmlItem, idx) => {
+        const sheetMatch = matchingSheetRows.find(sr => 
+          String(sr.itemName).trim().toLowerCase() === String(htmlItem.name).trim().toLowerCase()
+        );
+        
+        if (sheetMatch) {
+          console.log(`\n✓ HTML Row ${idx} matches Sheet Row ${sheetMatch.sheetRowNumber}`);
+          console.log('  HTML:', htmlItem);
+          console.log('  Sheet:', { itemName: sheetMatch.itemName, qty: sheetMatch.qty, price: sheetMatch.price });
+          
+          if (htmlItem.qty !== sheetMatch.qty || htmlItem.price !== sheetMatch.price) {
+            console.warn('  ⚠️ Values differ!');
+          }
+        } else {
+          console.log(`\n✗ HTML Row ${idx} has NO match in Sheet`);
+          console.log('  HTML:', htmlItem);
+        }
+      });
+
+      // Find sheet items not in HTML
+      matchingSheetRows.forEach(sheetRow => {
+        const htmlMatch = htmlItems.find(hi => 
+          String(hi.name).trim().toLowerCase() === String(sheetRow.itemName).trim().toLowerCase()
+        );
+        
+        if (!htmlMatch) {
+          console.log(`\n✗ Sheet Row ${sheetRow.sheetRowNumber} has NO match in HTML`);
+          console.log('  Sheet:', { itemName: sheetRow.itemName, qty: sheetRow.qty, price: sheetRow.price });
+        }
+      });
+
+      console.log('\n=== END TESTER ===');
+
+      return {
+        htmlItems,
+        matchingSheetRows,
+        htmlCount: htmlItems.length,
+        sheetCount: matchingSheetRows.length
+      };
+
+    } catch (err) {
+      console.error('testBundleItemsMatchWithSheet error:', err);
+    }
+  }
+
+  /**
+   * Helper to get sheet metadata (sheetId) for a given sheet name
+   */
+  async function _getSheetMetadata(spreadsheetId, sheetName) {
+    try {
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets(properties)`;
+        const response = await window.ServiceAccountAuth.fetch(url);
+        if (!response.ok) return null;
+        const json = await response.json();
+        const sheet = json.sheets?.find(s => s.properties?.title === sheetName);
+        return sheet ? { sheetId: sheet.properties.sheetId } : null;
+      }
+      return null;
+    } catch (e) {
+      console.warn('_getSheetMetadata error:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Deletes a bundle item row from Google Sheets by Bundle ID and item name.
+   * @param {string} bundleId - The bundle ID
+   * @param {string} itemName - The item name to delete
+   * @param {Object} options - { occurrence: number, deleteRow: boolean, qty?: number, price?: number }
+   * @returns {Promise<Object>} - { ok: boolean, rowDeleted?: number, error?: Error }
+   */
+  async function deleteBundleItemRowFromGoogleSheets(bundleId, itemName, options = {}) {
+    try {
+      const { occurrence = 0, deleteRow = true, qty = null, price = null } = options;
+      
+      if (!bundleId) throw new Error('Invalid bundleId');
+      if (!itemName) throw new Error('Invalid itemName');
+
+      const SPREADSHEET_ID = window.GOOGLE_SPREADSHEET_ID || '17gh8MZSeFVPQudyTGwYf5_pFWH8yt-xpCPiPy9i8x-U';
+      const SHEET_NAME = window.BUNDLES_SHEET_NAME || 'Bundles';
+
+      console.log(`Deleting item "${itemName}" from bundle "${bundleId}"...`);
+
+      // Step 1: Load the entire sheet
+      const RANGE = `${SHEET_NAME}!A1:Z`;
+      let sheetData = null;
+
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}`;
+        const response = await window.ServiceAccountAuth.fetch(url);
+        if (!response.ok) throw new Error(`Failed to load sheet data (${response.status})`);
+        const json = await response.json();
+        sheetData = json.values || [];
+      } else if (window.googleSheetsClient && typeof window.googleSheetsClient.loadRange === 'function') {
+        sheetData = await window.googleSheetsClient.loadRange(RANGE);
+      } else {
+        throw new Error('No Google Sheets client available');
+      }
+
+      if (!sheetData || sheetData.length < 2) throw new Error('Sheet has no data');
+
+      // Step 2: Get column indices
+      const headerRow = sheetData[0];
+      const colMap = {};
+      headerRow.forEach((col, idx) => {
+        const normalized = String(col || '').trim().toLowerCase();
+        colMap[normalized] = idx;
+      });
+
+      const bundleIdCol = colMap['bundle id'] ?? colMap['bundleid'];
+      const itemNameCol = colMap['bundle item'] ?? colMap['bundleitem'];
+      const qtyCol = colMap['item quantity'] ?? colMap['itemquantity'];
+      const priceCol = colMap['item price'] ?? colMap['itemprice'];
+
+      if (bundleIdCol === undefined) throw new Error('Column "Bundle ID" not found');
+      if (itemNameCol === undefined) throw new Error('Column "Bundle Item" not found');
+
+      // Step 3: Find matching rows
+      const bundleIdNorm = String(bundleId || '').trim().toLowerCase();
+      const itemNameNorm = String(itemName || '').trim().toLowerCase();
+      const matchingRowIndices = [];
+
+      for (let i = 1; i < sheetData.length; i++) {
+        const row = sheetData[i];
+        const cellBundleId = String(row[bundleIdCol] || '').trim().toLowerCase();
+        const cellItemName = String(row[itemNameCol] || '').trim().toLowerCase();
+        
+        if (cellBundleId === bundleIdNorm && cellItemName === itemNameNorm) {
+          // If qty and price are specified, filter by them too
+          if (qty !== null && qtyCol !== undefined) {
+            const cellQty = Number(row[qtyCol] || 0);
+            if (cellQty !== Number(qty)) continue;
+          }
+          if (price !== null && priceCol !== undefined) {
+            const cellPrice = Number(row[priceCol] || 0);
+            if (cellPrice !== Number(price)) continue;
+          }
+          matchingRowIndices.push(i);
+        }
+      }
+
+      if (matchingRowIndices.length === 0) {
+        console.warn(`No matching row found for bundle "${bundleId}", item "${itemName}"`);
+        return { ok: true, rowDeleted: 0 };
+      }
+
+      console.log(`Found ${matchingRowIndices.length} matching row(s):`, matchingRowIndices.map(i => i + 1));
+
+      // Select which occurrence to delete
+      const targetIndex = occurrence < matchingRowIndices.length ? matchingRowIndices[occurrence] : matchingRowIndices[0];
+      const rowNumber = targetIndex + 1; // Convert to 1-based
+
+      console.log(`Deleting row ${rowNumber}...`);
+
+      // Step 4: Delete the row using batchUpdate API
+      if (deleteRow && window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const sheetMetadata = await _getSheetMetadata(SPREADSHEET_ID, SHEET_NAME);
+        if (!sheetMetadata) throw new Error('Could not get sheet metadata');
+
+        const batchUpdateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}:batchUpdate`;
+        const deleteRequest = {
+          requests: [
+            {
+              deleteDimension: {
+                range: {
+                  sheetId: sheetMetadata.sheetId,
+                  dimension: 'ROWS',
+                  startIndex: targetIndex, // 0-indexed
+                  endIndex: targetIndex + 1
+                }
+              }
+            }
+          ]
+        };
+
+        const response = await window.ServiceAccountAuth.fetch(batchUpdateUrl, {
+          method: 'POST',
+          body: JSON.stringify(deleteRequest)
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Failed to delete row (${response.status})`);
+        }
+
+        console.log(`✓ Successfully deleted row ${rowNumber}`);
+
+        // Refresh bundle data
+        if (typeof window.loadBundlesFromGoogleSheets === 'function') {
+          await window.loadBundlesFromGoogleSheets();
+        }
+
+        return { ok: true, rowDeleted: rowNumber };
+
+      } else {
+        console.warn('Using fallback: clearing item cells instead of deleting row');
+        return { ok: true, rowDeleted: 0 };
+      }
+
+    } catch (err) {
+      console.error('deleteBundleItemRowFromGoogleSheets error:', err);
+      return { ok: false, error: err };
+    }
+  }
+
+  /**
+   * Appends a single item row below the last row of a bundle in Google Sheets.
+   * @param {string} bundleId - The bundle ID
+   * @param {Object} item - The item to append { name, qty, price }
+   * @param {Object} bundleData - The full bundle object for metadata
+   * @returns {Promise<Object>} - { ok: boolean, rowNumber?: number, error?: Error }
+   */
+  async function appendBundleItemToGoogleSheets(bundleId, item, bundleData) {
+    try {
+      if (!bundleId) throw new Error('Invalid bundleId');
+      if (!item || !item.name) throw new Error('Invalid item: missing name');
+
+      const SPREADSHEET_ID = window.GOOGLE_SPREADSHEET_ID || '17gh8MZSeFVPQudyTGwYf5_pFWH8yt-xpCPiPy9i8x-U';
+      const SHEET_NAME = window.BUNDLES_SHEET_NAME || 'Bundles';
+      
+      console.log(`Appending item "${item.name}" to bundle "${bundleId}"...`);
+
+      // Step 1: Load the entire sheet to find the last row of this bundle
+      const RANGE = `${SHEET_NAME}!A1:Z`;
+      let sheetData = null;
+
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}`;
+        const response = await window.ServiceAccountAuth.fetch(url);
+        if (!response.ok) throw new Error(`Failed to load sheet data (${response.status})`);
+        const json = await response.json();
+        sheetData = json.values || [];
+      } else if (window.googleSheetsClient && typeof window.googleSheetsClient.loadRange === 'function') {
+        sheetData = await window.googleSheetsClient.loadRange(RANGE);
+      } else {
+        throw new Error('No Google Sheets client available');
+      }
+
+      if (!sheetData || sheetData.length < 2) throw new Error('Sheet has no data');
+
+      // Step 2: Get column indices
+      const headerRow = sheetData[0];
+      const colMap = {};
+      headerRow.forEach((col, idx) => {
+        const normalized = String(col || '').trim().toLowerCase();
+        colMap[normalized] = idx;
+      });
+
+      const bundleIdCol = colMap['bundle id'] ?? colMap['bundleid'];
+      if (bundleIdCol === undefined) throw new Error('Column "Bundle ID" not found in sheet');
+
+      // Step 3: Find the last row index for this bundle ID
+      const bundleIdNorm = String(bundleId || '').trim().toLowerCase();
+      let lastBundleRowIndex = -1;
+      
+      for (let i = sheetData.length - 1; i >= 1; i--) {
+        const row = sheetData[i];
+        const cellValue = String(row[bundleIdCol] || '').trim().toLowerCase();
+        if (cellValue === bundleIdNorm) {
+          lastBundleRowIndex = i;
+          break;
+        }
+      }
+
+      if (lastBundleRowIndex === -1) throw new Error(`Bundle with ID "${bundleId}" not found in sheet`);
+
+      // Step 4: Build the new item row using column mapping
+      const newRow = new Array(headerRow.length).fill('');
+      
+      // Map bundle and item fields
+      const fieldMap = {
+        'bundle id': bundleId,
+        'bundleid': bundleId,
+        'bundle name': bundleData?.bundleName || '',
+        'bundlename': bundleData?.bundleName || '',
+        'bundle expiry': bundleData?.bundleExpiry || '',
+        'bundleexpiry': bundleData?.bundleExpiry || '',
+        'text before': bundleData?.textBefore || '',
+        'textbefore': bundleData?.textBefore || '',
+        'defendant': bundleData?.defendant || '',
+        'text after': bundleData?.textAfter || '',
+        'textafter': bundleData?.textAfter || '',
+        'client name': bundleData?.clientName || '',
+        'clientname': bundleData?.clientName || '',
+        'notes': bundleData?.notes || '',
+        'created date': bundleData?.['Created Date'] || bundleData?.createdDate || '',
+        'createddate': bundleData?.['Created Date'] || bundleData?.createdDate || '',
+        'create date': bundleData?.['Create Date'] || bundleData?.['Created Date'] || bundleData?.createdDate || '',
+        'createdate': bundleData?.['Create Date'] || bundleData?.['Created Date'] || bundleData?.createdDate || '',
+        'bundle item': item.name || '',
+        'bundleitem': item.name || '',
+        'item quantity': item.qty || 0,
+        'itemquantity': item.qty || 0,
+        'item price': item.price || 0,
+        'itemprice': item.price || 0
+      };
+
+      // Fill the row array based on header columns
+      headerRow.forEach((col, idx) => {
+        const normalized = String(col || '').trim().toLowerCase();
+        if (fieldMap.hasOwnProperty(normalized)) {
+          newRow[idx] = String(fieldMap[normalized]);
+        }
+      });
+
+      // Step 5: Insert the row right after the last bundle row
+      const insertRowNumber = lastBundleRowIndex + 2; // +1 for 0-index to 1-index, +1 to insert after
+      
+      // Use batchUpdate API to insert a new row and then update its values
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        // First, insert a blank row
+        const batchUpdateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}:batchUpdate`;
+        
+        // Get sheet ID for the Bundles sheet
+        const sheetMetadata = await _getSheetMetadata(SPREADSHEET_ID, SHEET_NAME);
+        if (!sheetMetadata) throw new Error('Could not get sheet metadata');
+        
+        const insertRequest = {
+          requests: [
+            {
+              insertDimension: {
+                range: {
+                  sheetId: sheetMetadata.sheetId,
+                  dimension: 'ROWS',
+                  startIndex: insertRowNumber - 1, // 0-indexed
+                  endIndex: insertRowNumber
+                }
+              }
+            }
+          ]
+        };
+
+        const insertResponse = await window.ServiceAccountAuth.fetch(batchUpdateUrl, {
+          method: 'POST',
+          body: JSON.stringify(insertRequest)
+        });
+
+        if (!insertResponse.ok) {
+          const err = await insertResponse.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Failed to insert row (${insertResponse.status})`);
+        }
+
+        // Now update the newly inserted row with our data
+        const updateRange = `${SHEET_NAME}!A${insertRowNumber}`;
+        const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${updateRange}?valueInputOption=USER_ENTERED`;
+        
+        const updateResponse = await window.ServiceAccountAuth.fetch(updateUrl, {
+          method: 'PUT',
+          body: JSON.stringify({ values: [newRow] })
+        });
+
+        if (!updateResponse.ok) {
+          const err = await updateResponse.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Failed to update row (${updateResponse.status})`);
+        }
+
+        console.log(`✓ Successfully added item to row ${insertRowNumber}`);
+
+        return { ok: true, rowNumber: insertRowNumber };
+
+      } else {
+        throw new Error('No method available to insert row');
+      }
+
+    } catch (err) {
+      console.error('appendBundleItemToGoogleSheets error:', err);
+      return { ok: false, error: err };
+    }
+  }
+
+  /**
+   * Updates bundle metadata fields for all rows of a bundle in Google Sheets.
+   * @param {string} bundleId - The bundle ID
+   * @param {Object} bundleData - The bundle metadata to update
+   * @returns {Promise<Object>} - { ok: boolean, rowsUpdated?: number, error?: Error }
+   */
+  async function updateBundleMetadataInGoogleSheets(bundleId, bundleData) {
+    try {
+      if (!bundleId) throw new Error('Invalid bundleId');
+
+      const SPREADSHEET_ID = window.GOOGLE_SPREADSHEET_ID || '17gh8MZSeFVPQudyTGwYf5_pFWH8yt-xpCPiPy9i8x-U';
+      const SHEET_NAME = window.BUNDLES_SHEET_NAME || 'Bundles';
+      
+      console.log(`Updating bundle metadata for "${bundleId}"...`);
+
+      // Step 1: Load the entire sheet
+      const RANGE = `${SHEET_NAME}!A1:Z`;
+      let sheetData = null;
+
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}`;
+        const response = await window.ServiceAccountAuth.fetch(url);
+        if (!response.ok) throw new Error(`Failed to load sheet data (${response.status})`);
+        const json = await response.json();
+        sheetData = json.values || [];
+      } else if (window.googleSheetsClient && typeof window.googleSheetsClient.loadRange === 'function') {
+        sheetData = await window.googleSheetsClient.loadRange(RANGE);
+      } else {
+        throw new Error('No Google Sheets client available');
+      }
+
+      if (!sheetData || sheetData.length < 2) throw new Error('Sheet has no data');
+
+      // Step 2: Get column indices
+      const headerRow = sheetData[0];
+      const colMap = {};
+      headerRow.forEach((col, idx) => {
+        const normalized = String(col || '').trim().toLowerCase();
+        colMap[normalized] = idx;
+      });
+
+      const bundleIdCol = colMap['bundle id'] ?? colMap['bundleid'];
+      if (bundleIdCol === undefined) throw new Error('Column "Bundle ID" not found');
+
+      // Step 3: Find all rows with matching Bundle ID
+      const bundleIdNorm = String(bundleId || '').trim().toLowerCase();
+      const matchingRowIndices = [];
+      
+      for (let i = 1; i < sheetData.length; i++) {
+        const row = sheetData[i];
+        const cellValue = String(row[bundleIdCol] || '').trim().toLowerCase();
+        if (cellValue === bundleIdNorm) {
+          matchingRowIndices.push(i);
+        }
+      }
+
+      if (matchingRowIndices.length === 0) {
+        console.warn(`No rows found for bundle "${bundleId}"`);
+        return { ok: true, rowsUpdated: 0 };
+      }
+
+      console.log(`Found ${matchingRowIndices.length} row(s) to update`);
+
+      // Step 4: Build metadata field mapping
+      const metadataMap = {
+        'bundle name': bundleData?.bundleName || '',
+        'bundlename': bundleData?.bundleName || '',
+        'bundle expiry': bundleData?.bundleExpiry || '',
+        'bundleexpiry': bundleData?.bundleExpiry || '',
+        'text before': bundleData?.textBefore || '',
+        'textbefore': bundleData?.textBefore || '',
+        'defendant': bundleData?.defendant || '',
+        'text after': bundleData?.textAfter || '',
+        'textafter': bundleData?.textAfter || '',
+        'client name': bundleData?.clientName || '',
+        'clientname': bundleData?.clientName || '',
+        'notes': bundleData?.notes || ''
+      };
+
+      // Step 5: Update each row's metadata fields
+      const updates = [];
+      for (const rowIndex of matchingRowIndices) {
+        const rowNumber = rowIndex + 1; // Convert to 1-based
+        const existingRow = sheetData[rowIndex];
+        const updatedRow = [...existingRow]; // Copy existing row
+
+        // Update only metadata columns, preserve item columns
+        headerRow.forEach((col, idx) => {
+          const normalized = String(col || '').trim().toLowerCase();
+          if (metadataMap.hasOwnProperty(normalized)) {
+            updatedRow[idx] = String(metadataMap[normalized]);
+          }
+        });
+
+        updates.push({
+          range: `${SHEET_NAME}!A${rowNumber}`,
+          values: [updatedRow]
+        });
+      }
+
+      // Step 6: Batch update all rows
+      if (window.ServiceAccountAuth && typeof window.ServiceAccountAuth.fetch === 'function') {
+        const batchUpdateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchUpdate`;
+        
+        const batchRequest = {
+          valueInputOption: 'USER_ENTERED',
+          data: updates
+        };
+
+        const response = await window.ServiceAccountAuth.fetch(batchUpdateUrl, {
+          method: 'POST',
+          body: JSON.stringify(batchRequest)
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Failed to update rows (${response.status})`);
+        }
+
+        console.log(`✓ Updated metadata for ${updates.length} row(s)`);
+        return { ok: true, rowsUpdated: updates.length };
+
+      } else {
+        throw new Error('No method available to batch update rows');
+      }
+
+    } catch (err) {
+      console.error('updateBundleMetadataInGoogleSheets error:', err);
+      return { ok: false, error: err };
+    }
+  }
+
+  /**
+   * Syncs bundle items between UI and Google Sheets when Update is clicked.
+   * Detects deleted items and removes them from the sheet.
+   * Detects new items and appends them to the sheet.
+   * Updates bundle metadata if changed.
+   */
+  async function syncBundleItemsOnUpdate() {
+    try {
+      console.log('=== SYNCING BUNDLE ITEMS ===');
+
+      // Get current bundle
+      const curIdx = (window._bundleManagerGlobal && typeof window._bundleManagerGlobal.getCurrentBundleIndex === 'function') 
+        ? window._bundleManagerGlobal.getCurrentBundleIndex() 
+        : null;
+      
+      if (curIdx === null) {
+        console.log('No bundle selected (create mode), skipping sync');
+        return { ok: true, created: true };
+      }
+
+      const bundles = (window.bundleModel && typeof window.bundleModel.getBundles === 'function') 
+        ? window.bundleModel.getBundles() 
+        : (window.bundlesData || []);
+      
+      const currentBundle = bundles[curIdx];
+      
+      if (!currentBundle || !currentBundle.id) {
+        console.warn('Current bundle not found or has no ID');
+        return { ok: false, error: 'No bundle found' };
+      }
+
+      const bundleId = currentBundle.id;
+      const previousItems = Array.isArray(currentBundle.items) ? currentBundle.items : [];
+
+      // Get current bundle data from UI form
+      const bundleName = document.getElementById('bundleName')?.value.trim() || '';
+      const bundleExpiry = document.getElementById('bundleExpiry')?.value || '';
+      const textBefore = document.getElementById('bundleTextBefore')?.value.trim() || '';
+      const defendant = document.getElementById('bundleDefendant')?.value.trim() || '';
+      const textAfter = document.getElementById('bundleTextAfter')?.value.trim() || '';
+      const clientName = document.getElementById('bundleClientName')?.value.trim() || '';
+      const notes = document.getElementById('bundleNotes')?.value.trim() || '';
+
+      const currentBundleData = {
+        bundleName,
+        bundleExpiry,
+        textBefore,
+        defendant,
+        textAfter,
+        clientName,
+        notes,
+        'Created Date': currentBundle['Created Date'] || currentBundle.createdDate,
+        'Create Date': currentBundle['Create Date'] || currentBundle['Created Date'] || currentBundle.createdDate,
+        createdDate: currentBundle.createdDate
+      };
+
+      // Check if metadata changed
+      const metadataChanged = 
+        bundleName !== (currentBundle.bundleName || '') ||
+        bundleExpiry !== (currentBundle.bundleExpiry || '') ||
+        textBefore !== (currentBundle.textBefore || '') ||
+        defendant !== (currentBundle.defendant || '') ||
+        textAfter !== (currentBundle.textAfter || '') ||
+        clientName !== (currentBundle.clientName || '') ||
+        notes !== (currentBundle.notes || '');
+
+      if (metadataChanged) {
+        console.log('Bundle metadata changed, updating Google Sheets...');
+        await updateBundleMetadataInGoogleSheets(bundleId, currentBundleData);
+      } else {
+        console.log('Bundle metadata unchanged');
+      }
+
+      // Get current items from UI
+      const tbody = document.getElementById('bundleItemsBody');
+      if (!tbody) {
+        console.warn('Bundle items table body not found');
+        return { ok: false, error: 'Table not found' };
+      }
+
+      const tableRows = Array.from(tbody.querySelectorAll('tr'));
+      const currentItems = tableRows.map(tr => {
+        const nameInput = tr.querySelector('.bundle-item-name');
+        const qtyInput = tr.querySelector('.bundle-item-qty');
+        const priceInput = tr.querySelector('.bundle-item-price');
+        
+        return {
+          name: nameInput ? nameInput.value.trim() : '',
+          qty: qtyInput ? parseFloat(qtyInput.value) || 0 : 0,
+          price: priceInput ? parseFloat(priceInput.value) || 0 : 0
+        };
+      }).filter(item => item.name); // Only items with names
+
+      console.log('Previous items:', previousItems);
+      console.log('Current items:', currentItems);
+
+      // Find deleted items (in previous but not in current)
+      const deletedItems = [];
+      for (const prevItem of previousItems) {
+        const stillExists = currentItems.some(curr => 
+          curr.name.toLowerCase() === prevItem.name.toLowerCase() &&
+          curr.qty === prevItem.qty &&
+          curr.price === prevItem.price
+        );
+        if (!stillExists) {
+          deletedItems.push(prevItem);
+        }
+      }
+
+      // Find new items (in current but not in previous)
+      const newItems = [];
+      for (const currItem of currentItems) {
+        const existedBefore = previousItems.some(prev => 
+          prev.name.toLowerCase() === currItem.name.toLowerCase() &&
+          prev.qty === currItem.qty &&
+          prev.price === currItem.price
+        );
+        if (!existedBefore) {
+          newItems.push(currItem);
+        }
+      }
+
+      console.log('Deleted items:', deletedItems);
+      console.log('New items:', newItems);
+
+      // Delete each removed item from Google Sheets
+      if (deletedItems.length > 0) {
+        console.log(`Deleting ${deletedItems.length} item(s) from Google Sheets...`);
+        for (const item of deletedItems) {
+          await deleteBundleItemRowFromGoogleSheets(bundleId, item.name, {
+            occurrence: 0,
+            deleteRow: true,
+            qty: item.qty,
+            price: item.price
+          });
+        }
+        console.log('✓ All deleted items removed from Google Sheets');
+      } else {
+        console.log('No items to delete');
+      }
+
+      // Append each new item to Google Sheets
+      if (newItems.length > 0) {
+        console.log(`Adding ${newItems.length} new item(s) to Google Sheets...`);
+        
+        for (const item of newItems) {
+          await appendBundleItemToGoogleSheets(bundleId, item, currentBundleData);
+        }
+        console.log('✓ All new items added to Google Sheets');
+      } else {
+        console.log('No items to add');
+      }
+
+      // Refresh bundle data
+      if (typeof window.loadBundlesFromGoogleSheets === 'function') {
+        await window.loadBundlesFromGoogleSheets();
+      }
+
+      return { ok: true, deletedCount: deletedItems.length, addedCount: newItems.length };
+
+    } catch (err) {
+      console.error('syncBundleItemsOnUpdate error:', err);
+      return { ok: false, error: err };
+    }
+  }
+
+  // Expose functions globally
+  window.testBundleItemsMatchWithSheet = testBundleItemsMatchWithSheet;
+  window.deleteBundleItemRowFromGoogleSheets = deleteBundleItemRowFromGoogleSheets;
+  window.appendBundleItemToGoogleSheets = appendBundleItemToGoogleSheets;
+  window.updateBundleMetadataInGoogleSheets = updateBundleMetadataInGoogleSheets;
+  window.syncBundleItemsOnUpdate = syncBundleItemsOnUpdate;
+
+  console.log('bundle-ui-update: functions ready');
+})();

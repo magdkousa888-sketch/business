@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator - IBS Consultancy</title>
+    <meta name="description"
+        content="Professional invoice management system for IBS Consultancy. Create, manage, and track invoices with integrated payment tracking and Google Sheets sync.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='2' y='3' width='3'
+         height='10' fill='%23059669'/><rect x='6' y='5' width='3' 
+         height='8' fill='%23059669'/><rect x='10' y='2' width='3' 
+         height='11' fill='%23059669'/></svg>">
+    <!-- Google Fonts: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Invoice Generator - IBS Consultancy">
+    <meta property="og:description"
+        content="Professional invoice management system for IBS Consultancy. Create, manage, and track invoices with integrated payment tracking and Google Sheets sync.">
+    <meta property="og:image"
+        content="data:image/png;base64,
+        iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAACXBIWXMAAAsTAAALE
+        wEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJcSURBVHg
+        B7dAxAQAgDMCwgX/PHdIwFCT06VprzwABz88ABhQLiCgWEFEsIKJYQESx
+        gIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQU
+        SwgolhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBU
+        QUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIB
+        EcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goFhBRLCCiWE
+        BEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIBEcUCIooFRBQLiCgWE
+        FEsIKJYQESxgIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEF
+        AuIKBYQUSwgolhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiK
+        KBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIBE
+        cUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYC
+        IYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQ
+        ESxgIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwg
+        olhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goFhB
+        RLCCiWEBEsYCIYgERxQIiigVEFAuIfAEd8wG7dhgLNAAAAABJRU5ErkJggg==">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://your-domain.com">
+    <meta property="og:site_name" content="IBS Consultancy">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Load Google credentials first -->
+    <script src="js/google-control/load_credentials.js"></script>
+    <script src="js/google-control/google_config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/vfs_fonts.js"></script>
+    <!-- load general css files for all components -->
+    <link rel="stylesheet" href="css/page-control/roots.css">
+    <link rel="stylesheet" href="css/page-control/layout.css">
+    <link rel="stylesheet" href="css/page-control/components.css">
+    <link rel="stylesheet" href="css/page-control/buttons.css">
+    <link rel="stylesheet" href="css/page-control/forms.css">
+    <link rel="stylesheet" href="css/page-control/invoice-body.css">
+    <link rel="stylesheet" href="css/page-control/invoice.css">
+    <link rel="stylesheet" href="css/page-control/tables.css">
+    <link rel="stylesheet" href="css/page-control/notifications.css">
+    <link rel="stylesheet" href="css/page-control/print.css">
+    <link rel="stylesheet" href="css/page-control/export.css">
+    <link rel="stylesheet" href="css/page-control/modals.css">
+    <!-- load Modals css files for all Modals -->
+    <link rel="stylesheet" href="css/modals/base.css">
+    <link rel="stylesheet" href="css/modals/small-modal.css">
+    <link rel="stylesheet" href="css/modals/system-logs.css">
+    <link rel="stylesheet" href="css/modals/client-report-modal.css">
+    <link rel="stylesheet" href="css/modals/payments.css">
+    <link rel="stylesheet" href="invoices systems with server/css/modals/bundles.css">
+    <link rel="stylesheet" href="css/modals/settings.css">
+    <link rel="stylesheet" href="css/modals/expenses.css">
+    <link rel="stylesheet" href="css/modals/delete-invoice.css">
+    <link rel="stylesheet" href="css/modals/duplicate-invoice.css">
+    <link rel="stylesheet" href="css/modals/responsive.css">
+    <link rel="stylesheet" href="css/export-control/report-export.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<header class="page-header">
+    <div class="brand">
+        <div class="brand-logo"><i class="bi bi-bar-chart-fill"></i></div>
+        <div class="brand-name">Invoice Studio</div>
+    </div>
+
+            <button id="notification-bell" class="notification-bell" title="You don't have Notifications at the moment!"
+            onclick="showGuideImage()" aria-label="Notifications">
+                <i class="bi bi-exclamation-lg"></i></button>
+            
+
+    </nav>
+</header>
+<body>
+<div class="modal-overlay" id="bundlesModalOverlay"><div class="modal-content"><div class="modal-header">
+      <h3>Bundle Manager</h3>
+     
+     <div class="header-controls">
+        
+     <input type="text" class="bundle-search-input" id="bundleSearchInput" placeholder="Search bundles..." style="padding: 4px 8px; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+        
+    
+     <button type="button" class="btn prev-btn" title="Previous" disabled="">Prev</button>
+        
+    <button type="button" class="btn nav-index" aria-hidden="true">0 / 0</button>
+       
+     <button type="button" class="btn next-btn" title="Next" disabled="">Next</button>
+        
+     <button class="modal-close" title="Close">×</button>
+      
+     </div>
+    </div><div class="modal-body">
+      <div class="form-grid">
+
+            <div>
+          <label>Bundle Name</label>
+
+            <input class="bundle-input" type="text" id="bundleName" placeholder="Bundle name">
+        
+            </div>
+        
+            <div>
+          
+            <label>Bundle Expiry</label>
+          
+            <input class="bundle-input" type="date" id="bundleExpiry">
+        
+            </div>
+        
+            <div>
+          
+            <label>Text Before</label>
+          
+            <input class="bundle-input" type="text" id="bundleTextBefore">
+        
+            </div>
+        
+            <div>
+          
+            <label>Defendant</label>
+          
+            <input class="bundle-input" type="text" id="bundleDefendant">
+        
+            </div>
+        
+            <div>
+          
+            <label>Text After</label>
+          
+            <input class="bundle-input" type="text" id="bundleTextAfter">
+        
+            </div>
+        
+            <div>
+          
+            <label>Client Name</label>
+          
+            <select class="bundle-input" id="bundleClientName"><option value="">Select client</option><option value="" disabled="">No clients found</option></select>
+        
+            </div>
+      
+            </div>
+
+      
+            <div class="table-scroll">
+        
+            <table class="bundle-items-table">
+          
+            <thead>
+            
+            <tr>
+              
+            <th style="width: 40%;">Bundle Item</th>
+              
+            <th style="width: 10%;">Qty</th>
+              
+            <th style="width: 15%;">Price</th>
+              
+            <th style="width: 15%;">Taxable</th>
+              
+            <th style="width: 15%;">Total</th>
+              
+            <th style="width: 5%;"></th>
+            
+            </tr>
+         
+            </thead>
+          
+            <tbody id="bundleItemsBody"><tr>
+      <td><input type="text" class="bundle-item-name" placeholder="Item name"></td>
+      
+    <td><input type="number" class="bundle-item-qty" min="0" step="1" value="1"></td>
+      
+    <td><input type="number" class="bundle-item-price" min="0" step="0.01" value="0.00"></td>
+  
+        <td><select class="bundle-item-taxable"><option value="Standard">Standard</option><option value="Exempt">Exempt</option><option value="Zero-rate">Zero-rate</option></select></td>
+      
+        <td class="bundle-item-total">0.00</td>
+     
+         <td class="actions-col"><button type="button" class="remove-btn" title="Remove item">X</button></td>
+    </tr></tbody>
+        
+            </table>
+        
+            <div class="table-actions">
+          
+            <div>
+           
+             <button type="button" class="btn add-line-btn">Add Item</button>
+          
+             </div>
+          
+             <div class="grand-total">Grand Total: AED <span id="bundleItemsGrandTotal">0.00</span></div>
+        
+             </div>
+      
+             </div>
+
+      
+             <div class="notes-row">
+        
+             <label>Notes</label>
+        
+             <input class="bundle-input" type="text" id="bundleNotes" maxlength="200" placeholder="Notes (max 200 chars)">
+
+                </div>
+
+
+                <div class="options-row">
+
+             <label for="addBrackets">Add brackets around item names</label>
+
+             <input type="checkbox" id="addBrackets" class="bundle-checkbox" checked="">      
+            <i id="bundleInfoIcon" class="bi bi-info-circle-fill" style="cursor: pointer; margin-left: 8px; color: var(--primary-blue, #3b82f6);"></i> </div>
+
+            
+
+            
+    <div id="bundlesSaveStatus" class="bundles-save-status" style="font-size: 13px; color: var(--muted-gray, #6b7280);"></div></div><div class="form-actions">
+  
+    <div class="action-bar">   
+  
+
+        <button type="button" class="cancel-btn btn" id="cancelBundleBtn">Cancel</button>
+ 
+        <button type="button" class="btn btn-append" id="getFromInvoiceBtn">Get From Invoice</button>
+
+    </div>
+   
+    <div class="action-bar">
+    
+     <button type="button" class="btn btn-danger" id="deleteBundleBtn" disabled="">Delete</button>
+
+        
+     
+    <button type="button" class="btn btn-success" id="newBundleBtn">New</button>
+     
+    <button type="button" class="btn btn-append" id="saveBundleBtn">Save</button>
+   
+    <button type="button" class="btn btn-append" id="sendToInvoiceBtn">Send to Invoice</button>
+;
+     </div>
+    </div></div></div>
+</div>
+</body>
+</html>

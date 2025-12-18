@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator - IBS Consultancy</title>
+    <meta name="description"
+        content="Professional invoice management system for IBS Consultancy. Create, manage, and track invoices with integrated payment tracking and Google Sheets sync.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='2' y='3' width='3'
+         height='10' fill='%23059669'/><rect x='6' y='5' width='3' 
+         height='8' fill='%23059669'/><rect x='10' y='2' width='3' 
+         height='11' fill='%23059669'/></svg>">
+    <!-- Google Fonts: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Invoice Generator - IBS Consultancy">
+    <meta property="og:description"
+        content="Professional invoice management system for IBS Consultancy. Create, manage, and track invoices with integrated payment tracking and Google Sheets sync.">
+    <meta property="og:image"
+        content="data:image/png;base64,
+        iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAYAAAB5fY51AAAACXBIWXMAAAsTAAALE
+        wEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJcSURBVHg
+        B7dAxAQAgDMCwgX/PHdIwFCT06VprzwABz88ABhQLiCgWEFEsIKJYQESx
+        gIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQU
+        SwgolhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBU
+        QUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIB
+        EcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goFhBRLCCiWE
+        BEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIBEcUCIooFRBQLiCgWE
+        FEsIKJYQESxgIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEF
+        AuIKBYQUSwgolhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiK
+        KBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIBE
+        cUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYC
+        IYgERxQIiigVEFAuIKBYQUSwgolhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQ
+        ESxgIhiARHFAiKKBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwg
+        olhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goFhB
+        RLCCiWEBEsYCIYgERxQIiigVEFAuIfAEd8wG7dhgLNAAAAABJRU5ErkJggg==">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://your-domain.com">
+    <meta property="og:site_name" content="IBS Consultancy">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Invoice Generator - IBS Consultancy">
+    <meta name="twitter:description"
+        content="Professional invoice management system for IBS Consultancy. Create, manage, and track invoices with integrated payment tracking and Google Sheets sync.">
+    <meta name="twitter:image"
+        content="data:image/png;base64,
+        iVBORw0KGgoAAAANSUhEUgAAASwAAAEsCAY
+        AAAB5fY51AAAACXBIWXMAAAsTAAALEwEAmpwYAA
+        AAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJ
+        cSURBVHgB7dAxAQAgDMCwgX/PHdIwFCT06VprzwABz
+        88ABhQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4goF
+        hBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLG
+        AiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKB
+        UQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgo
+        lhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiK
+        KBUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgo
+        lhARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKK
+        BUQUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolh
+        ARLGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBU
+        QUC4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhAR
+        LGAiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQU
+        C4goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLG
+        AiGIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4
+        goFhBRLCCiWEBEsYCIYgERxQIiigVEFAuIKBYQUSwgolhARLGAi
+        GIBEcUCIooFRBQLiCgWEFEsIKJYQESxgIhiARHFAiKKBUQUC4go
+        FhBRLCCiWEBEsYCIYgERxQIiigVEFAuIfAEd8wG7dhgLNAAAAABJRU5ErkJggg==">
+
+    <!-- Load Google credentials first -->
+    <script src="js/google-control/load_credentials.js"></script>
+    <script src="js/google-control/google_config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/vfs_fonts.js"></script>
+    <!-- load general css files for all components -->
+    <link rel="stylesheet" href="css/page-control/roots.css">
+    <link rel="stylesheet" href="css/page-control/layout.css">
+    <link rel="stylesheet" href="css/page-control/components.css">
+    <link rel="stylesheet" href="css/page-control/buttons.css">
+    <link rel="stylesheet" href="css/page-control/forms.css">
+    <link rel="stylesheet" href="css/page-control/invoice-body.css">
+    <link rel="stylesheet" href="css/page-control/invoice.css">
+    <link rel="stylesheet" href="css/page-control/tables.css">
+    <link rel="stylesheet" href="css/page-control/notifications.css">
+    <link rel="stylesheet" href="css/page-control/print.css">
+    <link rel="stylesheet" href="css/page-control/export.css">
+    <link rel="stylesheet" href="css/page-control/modals.css">
+    <!-- load Modals css files for all Modals -->
+    <link rel="stylesheet" href="css/modals/base.css">
+    <link rel="stylesheet" href="css/modals/small-modal.css">
+    <link rel="stylesheet" href="css/modals/system-logs.css">
+    <link rel="stylesheet" href="css/modals/client-report-modal.css">
+    <link rel="stylesheet" href="css/modals/payments.css">
+    <link rel="stylesheet" href="css/modals/bundles.css">
+    <link rel="stylesheet" href="css/modals/settings.css">
+    <link rel="stylesheet" href="css/modals/expenses.css">
+    <link rel="stylesheet" href="css/modals/delete-invoice.css">
+    <link rel="stylesheet" href="css/modals/duplicate-invoice.css">
+    <link rel="stylesheet" href="css/modals/responsive.css">
+    <link rel="stylesheet" href="css/export-control/report-export.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<header class="page-header">
+    <div class="brand">
+        <div class="brand-logo"><i class="bi bi-bar-chart-fill"></i></div>
+        <div class="brand-name">Invoice Studio</div>
+    </div>
+
+            <button id="notification-bell" class="notification-bell" title="You don't have Notifications at the moment!"
+            onclick="showGuideImage()" aria-label="Notifications">
+                <i class="bi bi-exclamation-lg"></i></button>
+            
+
+    </nav>
+</header>
+
+<body>
+
+    <!-- fixed non-intrusive toolbar (outside .container so it doesn't affect layout) -->
+    <aside id="sideToolbar" class="side-toolbar collapsed" aria-hidden="true" aria-label="Utility toolbar">
+        <div class="toolbar-top">
+
+            <!-- Add client button -->
+            <button class="toolbar-btn" data-action="addClient" title="New Client" aria-label="Add New Client">
+                <i class="bi bi-person-plus-fill" aria-hidden="true"></i>
+            </button>
+            <!-- Add bundle button -->
+            <button class="toolbar-btn" data-action="addBundle" title="Bundle Manager - CTRL+B"
+                aria-label="Bundle Manager">
+                <i class="bi bi-box-seam" aria-hidden="true"></i>
+            </button>
+
+            <!-- Reports button -->
+            <button class="toolbar-btn" data-action="reports" title="Reports" aria-label="Reports">
+                <i class="bi bi-bar-chart-fill" aria-hidden="true"></i>
+            </button>
+
+            <hr class="toolbar-separator" aria-hidden="true" />
+            <!-- Preview invoice button -->
+            <button id="toolbarPreviewInvBtn" class="toolbar-btn" data-action="previewInvoice" title="Edit Invoice" aria-label="Preview Invoice">
+                <i class="bi bi-pencil"></i>
+            </button>
+
+            <!-- Expenses Manager button -->
+            <button id="toolbarExpensesBtn" class="toolbar-btn" data-action="expensesManager" title="Expenses Manager" aria-label="Expenses Manager">
+                <i class="bi bi-wallet2" aria-hidden="true"></i>
+            </button>
+            
+            <!-- Delete invoice button (tool-bar) - only enabled when viewing Draft invoices -->
+            <button id="toolbarDeleteInvBtn" class="toolbar-btn" title="Delete Invoice" aria-label="Delete Invoice"
+                onclick="openDeleteModal()" disabled>
+                <i class="bi bi-trash-fill" aria-hidden="true"></i>
+            </button>
+
+            <!-- Update invoice button removed — updates are handled via Invoice Preview modal -->
+            
+
+
+            <hr class="toolbar-separator" aria-hidden="true" />
+            <!-- Settings button -->
+
+            <button class="toolbar-btn" data-action="settings" title="Settings" aria-label="Settings">
+                <i class="bi bi-gear-fill" aria-hidden="true"></i>
+            </button>
+            <!-- Home button -->
+            <!--<button class="toolbar-btn" data-action="home" title="Home" aria-label="Home">
+                <i class="bi bi-house-fill" aria-hidden="true"></i>
+            </button>-->
+            <!-- Load Data (Sheets) button -->
+            <button class="toolbar-btn" data-action="loadData" title="Load Data" aria-label="Load Data">
+                <i class="bi bi-plugin"></i>
+            </button>
+            <!-- Send Message button -->
+            <button id="toolbarSendMessageBtn" class="toolbar-btn" title="Send Message" aria-label="Send Message"
+                onclick="openSendMessageModal()">
+                <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+            </button>
+            <!-- Select Credentials Folder button -->
+            <button id="toolbarSelectFolderBtn" class="toolbar-btn" title="Select Credentials Folder"
+                aria-label="Select Credentials Folder" onclick="selectCredentialsFolder()">
+                <i class="bi bi-folder2-open" aria-hidden="true"></i>
+            </button>
+
+        </div>
+        <!-- <div class="toolbar-footer">
+            <button id="toolbarToggle" class="toolbar-toggle" aria-label="Toggle toolbar">
+                <i id="toolbarToggleIcon" class="bi bi-chevron-left" aria-hidden="true"></i>
+            </button>
+        </div>-->
+    </aside>
+
+    <div class="container">
+
+        <div class="layout-flex">
+
+
+            <div class="controls">
+                <div> <label style="color: grey; font-size: 20px"> Invoice Control Panel - 0.3</label>
+                </div>
+
+                <!-- Data Source Toggle -->
+                <div style="margin: 10px 0; padding: 8px; background: #f5f5f5; border-radius: 4px;" hidden>
+                    <label style="color: grey; font-size: 12px; font-weight: bold;">Data Source:</label>
+                    <label style="margin-left: 10px; cursor: pointer;" hidden>
+                        <input type="radio" name="dataSource" value="csv" id="dataSourceCSV"
+                            onchange="toggleDataSource()">
+                        <span style="color: grey; font-size: 12px;">CSV Upload</span>
+                    </label>
+                    <label style="margin-left: 15px; cursor: pointer;">
+                        <input type="radio" name="dataSource" value="sheets" id="dataSourceSheets" checked
+                            onchange="toggleDataSource()">
+                        <span style="color: grey; font-size: 12px;">Google</span>
+                    </label>
+                </div>
+
+                <div class="csv-section" id="csvUploadSection" style="display: none;">
+
+                    <div class="upload-section-header" onclick="toggleUploadSection()">
+                        <label class="upload-section-title">
+                            <span id="uploadSectionIcon" class="fold-icon">▼</span>
+                            File Uploads
+                            <span id="uploadStatus" class="upload-status">No files loaded</span>
+                        </label>
+                    </div>
+
+                    <div class="upload-section-content" id="uploadSectionContent">
+                        <div class="upload-item">
+                            <label>Client Database (CSV):</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="csvFile" accept=".csv" onchange="handleCSVUpload(event)">
+                                <span id="csvFileStatus" class="file-status"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="upload-item">
+                            <label>Invoices Database (CSV):</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="invoiceFile" accept=".csv" onchange="loadInvoicesCSV(event)">
+                                <span id="invoiceFileStatus" class="file-status"></span>
+
+                            </div>
+                        </div>
+                        <div class="upload-item">
+                            <label>Payments Database (CSV):</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="paymentsFile" accept=".csv" onchange="loadpaymnetCSVfile(event)">
+                                <span id="paymentfilestatus" class="file-status"></span>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Google Sheets Section -->
+                <div class="csv-section" id="googleSheetsSection">
+
+
+                    <!-- <div class="upload-section-content" style="padding: 15px;"> </div>-->
+
+
+                    <!-- Load Data moved to toolbar -->
+                    <div >
+                        <div id="sheetsLoadStatus" style="font-size: 12px; color: grey;"></div>
+                        <!-- <div id="columnsIndexStatus" style="font-size: 12px; color: #374151; padding:4px 8px; border-radius:12px; background: #f3f4f6; display:inline-block;">Columns Index: unknown</div>-->
+                        <!--   <button id="sysLogsDebugBtn" type="button" onclick="openSystemLogsModal()" style="font-size:12px; padding:6px 8px; border-radius:6px; background:#f3f4f6; border:1px solid #e5e7eb;">System Logs</button>-->
+                        <!-- removed duplicate Settings debug button — settings modal opens via toolbar only -->
+                    </div>
+
+                    <!-- System Logs debug modal -->
+                    <div id="systemLogsModal" class="modal-overlay small-modal" style="display:none;">
+                        <div class="modal">
+                            <h3>System Logs — Diagnostics</h3>
+                            <div id="systemLogsStatus"></div>
+                            <div class="modal-actions">
+                                <button type="button" onclick="runSystemLogPreview()"
+                                    class="btn btn-preview">Preview</button>
+                                <button type="button" onclick="runSystemLogAppend()" class="btn btn-append">Append
+                                    Now</button>
+                                <button type="button" onclick="runSystemLogFlush()" id="flushPendingBtn"
+                                    class="btn btn-flush">Flush Pending</button>
+                                <!--<button type="button" onclick="closeSystemLogsModal()" class="btn btn-utility">Close</button>-->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports modal (replaces download behavior) -->
+                    <div id="reportsModal" class="modal-overlay small-modal" style="display:none;">
+                        <!-- wider modal to fit table content and avoid trimming - responsive up to 1200px -->
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h3>Reports — Unpaid Invoices</h3>
+                                <button onclick="closeReportsModal()" class="modal-close">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="reports-filter-row">
+                                    <div>
+                                        <label>Client:</label>
+                                        <select id="reportsClientSelect"></select>
+                                    </div>
+                                    <div class="modal-actions">
+                                        <!--<button type="button" onclick="closeReportsModal()" class="btn btn-utility">Close</button> -->
+                                        <button type="button" id="unpaidInvoicesExport"
+                                            class="btn btn-export">Export</button>
+                                        <!--  <button id="reportsRefreshBtn" type="button" onclick="refreshReportsModal()" class="btn btn-refresh">Refresh</button> -->
+                                        <!--    inline totals have moved into the table footer (bottom of results) -->
+                                    </div>
+                                </div>
+
+                                <div id="reportsResults">
+                                    <table id="reportsResultsTable">
+                                        <thead>
+                                            <tr>
+                                                <!-- action column: reserve enough width for two compact buttons (Details + Mark Paid) -->
+                                                <th>&nbsp;</th>
+                                                <th>Client</th>
+                                                <th>Invoice</th>
+                                                <th>Total</th>
+                                                <th>Invoice Date</th>
+                                                <th>Due Date</th>
+                                                <th>Status</th>
+                                                <th>Paid</th>
+                                                <th>Outstanding</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reportsResultsTBody"></tbody>
+                                        <tfoot id="reportsResultsTFoot">
+                                            <tr>
+                                                <td></td>
+                                                <td>Totals</td>
+                                                <td></td>
+                                                <td id="reports_total">0.00</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td id="reports_paid">0.00</td>
+                                                <td id="reports_outstanding">0.00</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Settings modal -->
+                    <div id="settingsModal" class="modal-overlay small-modal" style="display:none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Settings</h3>
+                                <button onclick="closeSettings()" class="modal-close">&times;</button>
+                            </div>
+                            <div class="modal-body">
+<div class="settings-checkbox-row">
+                                    <input type="checkbox" id="showInactiveClients" class="settings-checkbox" />
+                                    <label for="showInactiveClients">Show Inactive Clients (include inactive contacts in
+                                        client lists)</label>
+                                </div>
+                                <div class="settings-note">Toggle this option to include
+                                                                        clients marked &quot;Inactive&quot; in the Contacts/Clients sheet in all client
+                                                                        dropdowns and the Reports modal.</div>
+
+                                                                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+
+                                                                <div class="settings-section">
+                                                                        <label class="settings-section-label">Auto-load data on page load</label>
+                                                                        <div class="settings-small-desc">Choose whether data should be automatically loaded from Google Sheets when the app starts. The system will always use the stored choice; if none is set it will default to auto-load.</div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" type="radio" name="autoLoadChoice" id="autoLoadOff" value="0">
+                                                                            <label class="form-check-label" for="autoLoadOff">Don't auto load</label>
+                                                                        </div>
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input" type="radio" name="autoLoadChoice" id="autoLoadOn" value="1">
+                                                                            <label class="form-check-label" for="autoLoadOn">Auto load on page load</label>
+                                                                        </div>
+                                                                </div>
+                                <div class="settings-note">Toggle this option to include
+                                    clients marked &quot;Inactive&quot; in the Contacts/Clients sheet in all client
+                                    dropdowns and the Reports modal.</div>
+
+                                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+
+                                <div style="padding:10px 0;">
+                                    <label style="font-weight:bold; display:block; margin-bottom:8px;">Google
+                                        Credentials Folder</label>
+                                    <div style="font-size:12px; color:#666; margin-bottom:10px;">Select the folder
+                                        containing your Google API credentials (API Key.txt, Google sheet ID.txt,
+                                        service-account.json)</div>
+                                    <button type="button" id="selectCredentialsFolderBtn"
+                                        onclick="selectCredentialsFolder()" class="save-client-btn w-100">Select
+                                        Credentials Folder</button>
+                                    <div id="credentialsFolderStatus"
+                                        style="margin-top:8px; padding:8px; background:#f0f9ff; border-radius:4px; font-size:12px; display:none;">
+                                        <span id="credentialsFolderName"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" onclick="closeSettings()" class="cancel-btn">Cancel</button>
+                                <button type="button" onclick="applySettings()" class="save-client-btn">Save</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="controls-row">
+
+                    <div class="buttons">
+                        <button onclick="window.print()"> Print</button>
+                        <button onclick="showPrevInvoice()" id="prevInvBtn" disabled>Prev Invoice</button>
+                        <button onclick="showNextInvoice()" id="nextInvBtn" disabled>Next Invoice </button>
+                    </div>
+                    <div class="buttons">
+
+                        <button onclick="RecordPayment()" class="btn-payment">Payment</button>
+                        <!-- Export to PDF moved to toolbar (see js/export-control/toolbar-export-invoice.js) -->
+                        <button onclick="addNewInvoice()">New Invoice</button>
+                        <button onclick="saveCurrentInvoice()"> Save Invoice</button>
+                        <!-- Delete button moved to toolbar (kept here removed) -->
+                    </div>
+
+
+                </div>
+
+                <!-- Replace the client selector section -->
+                <div class="csv-section">
+                    <div class="client-section-header" id="clientSectionHeader">
+                        <label class="client-section-title"
+                            style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="display: flex; align-items: center; gap: 8px;">
+                                <span id="clientSectionIcon" class="fold-icon">▶</span>
+                                Invoice Details
+                            </span>
+                            <span id="clientSectionStatus" class="section-status">(Click to expand)</span>
+                        </label>
+                    </div>
+
+                    <script>
+                        // Inline event listener to ensure it works before globals.js loads
+                        document.getElementById('clientSectionHeader').addEventListener('click', function () {
+                            const content = document.getElementById('clientSectionContent');
+                            const icon = document.getElementById('clientSectionIcon');
+
+                            if (content && icon) {
+                                const isCollapsed = content.classList.contains('collapsed');
+
+                                if (isCollapsed) {
+                                    content.classList.remove('collapsed');
+                                    icon.textContent = '▼';
+                                } else {
+                                    content.classList.add('collapsed');
+                                    icon.textContent = '▶';
+                                }
+                            }
+                        });
+                    </script>
+
+                    <div class="client-section-content collapsed" id="clientSectionContent">
+                        <div class="client-selector" style="justify-content: space-between;">
+                            <label>Select Client: <span style="color:red">*</span></label>
+                            <select id="clientDropdown" onchange="selectClient()" disabled style="max-width: 60%;">
+                                <option value="">-- Upload CSV file first --</option>
+                            </select>
+                            <!-- 'New' client moved to toolbar -->
+                        </div>
+                        <!-- Add this after your client selector section -->
+
+
+                        <!-- Manual client modal moved to top-level after container to avoid clipping when client section is collapsed -->
+                        <div class="client-selector" style="justify-content: space-between;">
+                            <label>Place of Supply: <span style="color:red">*</span></label>
+                            <select id="emirateDropdown" required disabled style="max-width: 60%;">
+                                <option value="">--Select Emirate--</option>
+                                <option value="Abu Dhabi">Abu Dhabi</option>
+                                <option value="Dubai">Dubai</option>
+                                <option value="Sharjah">Sharjah</option>
+                                <option value="Ajman">Ajman</option>
+                                <option value="Fujairah">Fujairah</option>
+                                <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                                <option value="Umm Al Quwain">Umm Al Quwain</option>
+                            </select>
+                        </div>
+
+                        <div class="client-selector" style="justify-content: space-between;">
+                            <label>VAT Treatment: <span style="color:red">*</span></label>
+                            <select id="vatTreatmentDropdown" disabled style="max-width: 60%;">
+                                <option value="">--Select VAT Treatment--</option>
+                                <option value="Dz Vat Registered">Dz Vat Registered</option>
+                                <option value="Vat Registered">Vat Registered</option>
+                                <option value="Vat Not Registered">Vat Not Registered</option>
+                                <option value="Dz Vat Not Registered">Dz Vat Not Registered</option>
+                                <option value="Gcc Vat Registered">Gcc Vat Registered</option>
+                                <option value="Gcc Vat Not Registered">Gcc Vat Not Registered</option>
+                                <option value="Non Gcc">Non Gcc</option>
+                            </select>
+                        </div>
+
+                        <div class="client-selector" style="justify-content: space-between;">
+                            <label>Invoice Status:</label>
+                            <select id="invoiceStatusDropdown" disabled style="max-width: 60%;">
+                                <option value="Draft">Draft</option>
+                                <option value="Sent">Sent</option>
+                                <option value="Closed">Closed</option>
+                                <option value="Overdue">Overdue</option>
+                            </select>
+                        </div>
+
+                        <!--<div class="client-selector">
+                            <label>Project Code:</label>
+                            <input type="text" id="projectCodeInput" placeholder="Enter Project Code" disabled>
+                        </div>-->
+
+                    </div>
+
+
+                </div>
+
+
+
+
+
+                <div class="csv-section">
+
+                    <!-- 5. Filter Control Buttons -->
+                    <div class="buttons filter-buttons"
+                        style="justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="padding-top: 10px" class="filter-section-title">Filter Invoices</label>
+                        <button onclick="clearFilters()" class="clear-filter-btn btn btn-payment">Clear All
+                            Filters</button>
+                        <button onclick="applyFilters()" class="apply-filter-btn">Apply Filters</button>
+                    </div>
+
+                    <!-- 1. Type anything to search -->
+                    <div class="client-selector" style="justify-content: space-between;">
+                        <label>Search for:</label>
+                        <div class="invoice-number-filter-container" style="max-width: 60%;">
+                            <input type="text" id="filterInvoiceNumber" class="filter-invoice-input"
+                                placeholder="Type anything (invoice no, client, item, amounts, notes…)" />
+                            <button onclick="clearInvoiceNumberFilter()" class="clear-invoice-filter-btn hidden"
+                                id="clearInvoiceBtn">×</button>
+                        </div>
+                    </div>
+
+                    <!-- 2. Filter by Client -->
+                    <div class="client-selector" style="justify-content: space-between;">
+                        <label>Filter by Client:</label>
+                        <select id="filterClientDropdown" class="filter-client-select" style="max-width: 60%;">
+                            <option value="">All Clients</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. Invoice Status -->
+                    <div class="client-selector" style="justify-content: space-between;">
+                        <label>Invoice Status:</label>
+                        <select id="filterStatusDropdown" class="filter-status-select" style="max-width: 60%;">
+                            <option value="">All Statuses</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Sent">Sent</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. Date Range -->
+                    <div class="client-selector" style="flex-direction: column; align-items: stretch;">
+                        <label>Date Range:</label>
+                        <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                            <select id="datePresetDropdown" class="filter-status-select" style="max-width: 100%;">
+                                <option value="">Custom Date Range</option>
+                                <option value="current-month">Current Month</option>
+                                <option value="previous-month">Previous Month</option>
+                                <option value="this-quarter">This Quarter</option>
+                                <option value="this-year">This Year</option>
+                            </select>
+                            <div class="date-range-container" style="display: flex; align-items: center; gap: 8px;">
+                                <input type="date" id="filterDateFrom" class="date-input" style="flex: 1;">
+                                <span class="date-separator" style="color: #6b7280; font-weight: 500;">to</span>
+                                <input type="date" id="filterDateTo" class="date-input" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <!-- Enhanced Results Container -->
+                    <div class="filter-results-container">
+                        <div id="filterResults" class="filter-results-main">Showing all invoices</div>
+                        <div id="filterResultsDetailed" class="filter-results-detailed"></div>
+                    </div>
+                </div>
+                <!-- Add this temporarily to debug -->
+                <!-- <div class="buttons" style="margin-top: 10px">
+                    <button class="save-client-btn" onclick="downloadCSVTemplate()">Inv. Template</button>
+                    <button class="save-client-btn" type="button" onclick="exportUpdatedClientCSV()">
+                        Export Clients
+                    </button>
+                    <button class="save-client-btn" onclick="exportZohoCSV()">Export Invoices</button>
+                </div> -->
+                <div
+                    style="text-decoration: none; font-family: Arial, sans-serif; font-weight: normal;padding-top: 20px; font-size: 10px; color: grey;">
+                    <strong>
+                        <a href="http://wa.me/971545646303"
+                            style="font-family: Arial, sans-serif; font-weight: normal; text-decoration: underline; color: inherit;">
+                            Contact: Majd Kousa
+                        </a>
+                    </strong>
+                </div>
+            </div>
+<div class="invoice-container">
+<div id="invoiceRibbon" class="ribbon" hidden>
+    <div id="invoiceRibbonInner" class="ribbon-inner ribbon-none"></div>
+</div>
+    <div class="invoice-wrapper" id="invoice">
+               
+                <div class="invoice">
+                    <div class="header">
+                        <div class="company-info">
+                            <img src="logo.png" alt="Company Logo"
+                                style="height: 70px; width: 180px; margin-bottom: 20px;">
+                            <div class="company-name">IBS Consultancy L.L.C</div>
+                            <div class="company-address">
+                                Sheikh Zayed Rd, DIFC, Al Saqr Business Tower, 27th Floor -<br>
+                                office 20, Dubai, UAE<br>
+                                TRN 104220602700003
+                            </div>
+                            <div class="company-contact">
+                                +971 4 272 0034<br>
+                                info@ibs-mea.com
+
+                            </div>
+                        </div>
+                        <div class="invoice-title">
+                            <div class="tax-invoice">TAX INVOICE</div>
+                            <div class="invoice-number"># <input type="text" id="invoiceNumber" value="INV-0000543"
+                                    style="border:none; padding:2px; font-size:12px; width:100px;"></div>
+                        </div>
+                    </div>
+                    <div class="invoice-details">
+                        <div class="bill-to">
+                            <div class="bill-to-label">Bill To</div>
+                            <div class="bill-to-content">
+                                <div class="client-name-display" id="clientNameDisplay">BAMX INVESTMENT LLC</div>
+                                <div id="clientAddressDisplay">
+                                    Office No. 1201, H Hotel & Office Tower S.P.V. Limited - First Trade Centre<br>
+                                    Dubai<br>
+                                    United Arab Emirates
+                                </div>
+                                <!-- Billing country parsed separately from Contacts: Billing Country -->
+                                <div id="clientCountryDisplay" style="margin-top:4px; color: #333; font-size: 10px;">
+                                </div>
+                                <div style="margin-top: 3px; font-size: 10px;" id="clientTRNDisplay">TRN 104331472100003
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invoice-meta">
+                            <div class="meta-row">
+                                <span class="meta-label">Invoice Date :</span>
+                                <span class="meta-value"><input type="date" id="invoiceDate" value="2025-10-03"></span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label" id="termsLabel">Terms :</span>
+                                <span class="meta-value"><input type="text" id="terms" value="Due on Receipt"></span>
+                            </div>
+                            <div class="meta-row">
+                                <span class="meta-label">Due Date :</span>
+                                <span class="meta-value"><input type="date" id="dueDate" value="2025-10-03"></span>
+                            </div>
+
+                            <div class="meta-row">
+                                <span class="meta-label">Project Code :</span>
+                                <span class="meta-value"><input type="text" id="projectCode" value=""></span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width:4%;">#</th>
+                                <th style="width:38%;">Description</th>
+                                <th style="width:6%;">Qty</th>
+                                <th style="width:12%;">Rate</th>
+                                <th style="width:8%;">Discount</th>
+                                <th style="width:12%;">Taxable Amount</th>
+                                <th style="width:10%;">Tax Amount</th>
+                                <th style="width:8%;">Tax %</th>
+                                <th style="width:14%;">Total</th>
+                                <th style="width:2%;" class="editable-hide"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTable">
+                            <!-- rows inserted via JS -->
+                        </tbody>
+                    </table>
+                    <button class="add-line-btn editable-hide" onclick="addRow()">+ Add Line Item</button>
+                    <div class="totals">
+                        <div class="totals-row">
+                            <div class="totals-label">Sub Total</div>
+                            <div class="totals-value" id="subtotal">0.00</div>
+                        </div>
+                        <div class="totals-row">
+                            <div class="totals-label">Total Tax</div>
+                            <div class="totals-value" id="totalTax">0.00</div>
+                        </div>
+                        <div class="totals-row grand-total">
+                            <div class="totals-label">Total</div>
+                            <div class="totals-value" id="grandTotal">0.00</div>
+                        </div>
+                    </div>
+                    <div class="balance-due">
+                        Payment made <span id="balanceDue">0.00</span>
+                    </div>
+                    <div class="balance-due">
+                        Balance Due <span id="remainingBalance">0.00</span>
+                    </div>
+                    <div class="notes">
+                        <div class="notes-label">Notes</div>
+                        <textarea id="notesText">Thanks for your business.</textarea>
+                    </div>
+
+                    <div class="bank-details">
+                        <div class="bank-title">Bank Account Details</div>
+                        <div class="bank-row">
+                            <span class="bank-label">Bank Account Name:</span>
+                            <span>I B S Consultancy LLC</span>
+                        </div>
+                        <div class="bank-row">
+                            <span class="bank-label">Bank Name:</span>
+                            <span>Emirates NBD</span>
+                        </div>
+                        <div class="bank-row">
+                            <span class="bank-label">IBAN:</span>
+                            <span>AE360260001015867786601</span>
+                        </div>
+                        <div class="bank-row">
+                            <span class="bank-label">Account No:</span>
+                            <span>1015867786601</span>
+                        </div>
+                        <div class="bank-row">
+                            <span class="bank-label">Swift Code:</span>
+                            <span>EBILAEAD</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>  
+<div id="test-invoice" style="max-height: 800mm !important;"></div>
+        </div>
+        <!-- All invoices table removed per user request — this app no longer displays a full invoices table.
+                       The underlying invoice data (window.allInvoices) is retained but not rendered to an in-page table.
+                  -->
+    </div>
+
+
+    <!-- Manual Client Popup Modal (kept at top-level so it remains interactive even if client section is collapsed) -->
+    <div id="manualClientModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Client Manually</h3>
+                <button onclick="closeManualClientPopup()" class="modal-close">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="manualClientForm">
+                    <div class="form-group">
+                        <label for="manualCompanyName">Company Name: <span style="color:red">*</span></label>
+                        <input type="text" id="manualCompanyName" placeholder="Enter company name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualDisplayName">Display Name: <span style="color:red">*</span></label>
+                        <input type="text" id="manualDisplayName" placeholder="Display name (defaults to Company Name)"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualAddress1">Address Line 1: <span style="color:red">*</span></label>
+                        <input type="text" id="manualAddress1" placeholder="Enter address line 1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualAddress2">Address Line 2:</label>
+                        <input type="text" id="manualAddress2" placeholder="Enter address line 2 (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualCity">City: <span style="color:red">*</span></label>
+                        <input type="text" id="manualCity" placeholder="Enter city" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualCountry">Country: <span style="color:red">*</span></label>
+                        <select id="manualCountry" required>
+                            <option value="">Select Country</option>
+                            <option value="United Arab Emirates">United Arab Emirates</option>
+                            <option value="Saudi Arabia">Saudi Arabia</option>
+                            <option value="Kuwait">Kuwait</option>
+                            <option value="Qatar">Qatar</option>
+                            <option value="Bahrain">Bahrain</option>
+                            <option value="Oman">Oman</option>
+                            <option value="Jordan">Jordan</option>
+                            <option value="Lebanon">Lebanon</option>
+                            <option value="Egypt">Egypt</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualTRN">TRN Number:</label>
+                        <input type="text" id="manualTRN" placeholder="Enter TRN number (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualContactName">Contact Name:</label>
+                        <input type="text" id="manualContactName" placeholder="Primary contact person (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualMobilePhone">Mobile Phone:</label>
+                        <input type="text" id="manualMobilePhone" placeholder="Mobile phone number (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualEmailID">Email ID:</label>
+                        <input type="email" id="manualEmailID" placeholder="Contact email (optional)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manualProjectCode">Project Code:</label>
+                        <input type="text" id="manualProjectCode" placeholder="Enter project code (optional)">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="saveManualClient()" class="save-client-btn">Save Client</button>
+                        <button type="button" onclick="closeManualClientPopup()" class="cancel-btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirmation modal (small non-blocking popup) -->
+    <div id="deleteInvoiceModal" class="modal-overlay small-modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Delete Invoice</h3>
+                <button id="deleteModalClose" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteModalMessage">Are you sure you want to permanently delete this invoice? Only invoices in
+                    <strong>Draft</strong> status can be deleted.</div>
+                <div id="deleteModalInvoiceNumber"></div>
+            </div>
+            <div class="modal-actions">
+                <button id="deleteModalCancel" class="cancel-btn">Cancel</button>
+                <button id="deleteModalConfirm" class="save-client-btn btn-danger">Delete Invoice</button>
+            </div>
+        </div>
+    </div>
+    <!-- Optional: client-side Google Sheets integration (serverless). To enable, set these globals
+            before loading the page (in a HEAD script block) or configure at runtime:
+            window.ENABLE_CLIENT_GOOGLE = true;
+            window.GOOGLE_API_KEY = 'YOUR_API_KEY';
+            window.GOOGLE_CLIENT_ID = 'YOUR_OAUTH_CLIENT_ID.apps.googleusercontent.com';
+            window.GOOGLE_SPREADSHEET_ID = '...';
+            The client will use the browser OAuth flow to request permission to append/read the sheet.
+        --><!-- JS code goes here -->
+    <script src="js/ui-elements/globals.js"></script>
+    <script src="js/ui-elements/ui_feedback.js"></script>
+    <script src="js/ui-elements/ui_helpers.js"></script>
+    <script src="js/ui-elements/context_menu.js"></script>
+
+    <!-- Filter Controls -->
+    <script src="js/filter-control/filters.js"></script>
+    <script src="js/filter-control/date_filter_presets.js"></script>
+
+    <!-- Google Sheets & Data Loading -->
+    <script src="js/google-control/service_account_auth.js"></script>
+    <script src="js/google-control/data_loader.js"></script>
+    <script src="js/google-control/columns_index_loader.js"></script>
+    <script src="js/google-control/session_logger.js"></script>
+    <script src="js/google-control/google_sheets_client.js"></script>
+    <script src="js/google-control/client_settings.js"></script>
+
+    <!-- Invoice Controls -->
+    <script src="js/invoice-control/invoice_renderer.js"></script>
+    <script src="js/invoice-control/invoice-ribbon.js"></script>
+    <script src="js/invoice-control/navigation.js"></script>
+    <script src="js/invoice-control/add_new_invoice.js"></script>
+    <script src="js/invoice-control/table_manager.js"></script>
+    <script src="js/invoice-control/save_invoice.js"></script>
+    <script src="js/invoice-control/invoice-update/helpers.js"></script>
+    <script src="js/invoice-control/invoice-update/tax_utils.js"></script>
+    <script src="js/invoice-control/invoice-update/update_invoice.js"></script>
+    <script src="js/invoice-control/invoice-update/invoice-preview.js"></script>
+    <!-- invoice-change-detector removed: updates are performed via Preview modal only -->
+    <script src="js/invoice-control/delete_invoice.js"></script>
+    <script src="js/invoice-control/invoice_clone.js"></script>
+    <script src="js/invoice-control/invoice-control-panel.js"></script>
+
+    <!-- Client Controls -->
+    <script src="js/client-control/client_manager.js"></script>
+    <script src="js/client-control/client_add.js"></script>
+    <!-- Bundles Controls -->
+    <script src="js/bundles-control/bundle-model.js"></script>
+    <script src="js/bundles-control/bundle-utils.js"></script>
+    <script src="js/bundles-control/bundle-add.js"></script>
+    <script src="js/bundles-control/bundle-delete.js"></script>
+    <script src="js/bundles-control/bundle-ui-update.js"></script>
+    <script src="js/bundles-control/bundle-ui-save.js"></script>
+    <script src="js/bundles-control/bundle-preview.js"></script>
+    <script src="js/bundles-control/bundle-send-invoice.js"></script>
+    <script src="js/bundles-control/bundle-from-invoice.js"></script>
+    <script src="js/bundles-control/bundle-ui.js"></script>
+    <script src="js/bundles-control/bundle-dataLoad.js"></script>
+    <script src="js/expenses-control/expenses-loader.js"></script>
+    <script src="js/expenses-control/expenses-bulk-loader.js"></script>
+    <script src="js/expenses-control/expenses-save.js"></script>
+    <script src="js/expenses-control/expenses-modal.js"></script>
+
+    <!-- Payment Controls -->
+    <script src="js/payment-conrol/payment_manager.js"></script>
+
+    <!-- Reports & Messaging -->
+    <script src="js/report-control/settings.js"></script>
+    <script src="js/report-control/message_sender.js"></script>
+    <script src="js/report-control/unpaid_invoices_report.js"></script>
+    <script src="js/report-control/reports.js"></script>
+    <script src="js/report-control/client_report_export.js"></script>
+    <script src="js/export-control/export-invoice.template.js"></script>
+    <script src="js/export-control/export-invoice.utils.js"></script>
+    <script src="js/export-control/export-invoice.collect.js"></script>
+    <script src="js/export-control/toolbar-export-invoice.js"></script>
+    <script src="js/export-control/export-invoice.populate.js"></script>
+    <script src="js/export-control/export-invoice.render.js"></script>
+    <script src="js/export-control/export-invoice.js"></script>
+
+    <!-- Ensure you have html2pdf.js loaded before this script -->
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyDQ1Al7uzC2xxGjx9H8E1UfW6L_WZ0gk_w",
+    authDomain: "analysis-fd088.firebaseapp.com",
+    projectId: "analysis-fd088",
+    storageBucket: "analysis-fd088.firebasestorage.app",
+    messagingSenderId: "417703188576",
+    appId: "1:417703188576:web:75879ce7fa6a2c21a4cb05",
+    measurementId: "G-CVLS5B3H33"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+    
+</body>
+
+</html>
