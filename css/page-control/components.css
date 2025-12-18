@@ -1,0 +1,338 @@
+/* components.css — reusable UI components (buttons, dropdowns) */
+/* Button layout is moved to css/buttons.css */
+
+.toolbar-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px;
+  margin: 6px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.toolbar-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+/* components.css — reusable UI components (buttons, dropdowns) */
+/* Button layout is moved to css/buttons.css */
+
+/* Header Styling */
+header {
+  background: var(--bg-surface, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  margin-left: -60px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary, #197f78);
+}
+
+.brand-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #197f78);
+
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings: "wdth" 100, "wght" 700;
+}
+
+
+
+header nav ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+header nav ul li a {
+  color: var(--text-secondary, #6b7280);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+header nav ul li a:hover {
+  color: var(--btn-primary, #059669);
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .brand-name {
+    font-size: 16px;
+  }
+  
+  header nav ul {
+    gap: 1rem;
+  }
+  
+  header nav ul li a {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  
+  header nav ul {
+    gap: 0.75rem;
+  }
+  
+  header nav ul li a {
+    font-size: 12px;
+  }
+}
+/* Client Selector Component */
+.client-selector select { flex: 1; padding: 7px; border: 1px solid var(--border-color, #d1d5db); border-radius: 3px; font-size: 12px; background: var(--bg-surface, #ffffff); max-width: 200px; min-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.client-selector select option { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 4px 8px; }
+#clientDropdown { max-width: 200px; min-width: 120px; }
+
+/* Small utility for status badges */
+.save-indicator { font-size: 11px; padding: 4px 8px; border-radius: 12px; margin: 8px 0; text-align: center; font-weight: 500; transition: all 0.3s ease; }
+.save-indicator.saved { background: var(--success-bg, #dcfce7); color: var(--success-color, #166534); border: 1px solid #bbf7d0; }
+.save-indicator.unsaved { background: var(--warn-bg, #fef3c7); color: var(--warn-color, #92400e); border: 1px solid #fbbf24; animation: pulse 2s infinite; }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+/* small filter input */
+.invoice-number-filter-container {
+	display: flex;
+	align-items: center;
+	position: relative;
+	width: 100%;
+}
+
+.filter-invoice-input {
+	flex: 1;
+	padding: 7px;
+	border: 1px solid #d1d5db;
+	border-radius: 3px;
+	font-size: 12px;
+	background: white;
+	transition: border-color 1s ease;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+}
+
+/* --- non-intrusive side toolbar --- */
+.side-toolbar{
+	position: fixed;
+	top: 50%;
+	left: 6px; /* keep near edge but outside normal flow */
+	transform: translateY(-50%);
+	z-index: 9999; /* overlay only */
+	width: 44px; height: auto; display:flex; flex-direction:column; align-items:center; gap:8px;
+  background: var(--btn-primary, #059669); color: var(--btn-primary-color-on, #fff); border-radius:8px; padding:6px; box-shadow:0 10px 30px rgba(0,0,0,0.18);
+	transition: left 160ms ease, opacity 160ms ease, transform 160ms ease;
+	pointer-events: auto; /* interactive; when collapsed it's mostly off-screen so won't interfere */
+}
+
+/* small green check badge for a successful load state */
+/* toolbar button visuals moved to css/buttons.css */
+
+/* hide the status element when it has no content */
+#sheetsLoadStatus:empty { display: none; }
+
+/* collapsed: tuck mostly off-screen so it never causes layout shift or horizontal scroll */
+.side-toolbar.collapsed{ left: 6px; opacity:0.95; pointer-events: none; }
+.side-toolbar.collapsed .toolbar-btn, .side-toolbar.collapsed .toolbar-toggle { pointer-events: auto; }
+
+/* expanded: overlay on top of content when toggled */
+.side-toolbar.expanded{ left: 8px; pointer-events: auto; }
+
+/* Notification badge pulse animation */
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* ensure not printed and doesn't affect printing */
+@media print { .side-toolbar { display: none !important; } }
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  /* buttons rules moved to css/buttons.css */
+  
+  .client-selector { flex-wrap: wrap; gap: 6px; }
+  .client-selector label { min-width: 80px; font-size: 11px; }
+  .client-selector select { max-width: 100%; font-size: 11px; padding: 6px; }
+  #clientDropdown { max-width: 100%; }
+  
+  .filter-invoice-input { max-width: 100%; font-size: 11px; padding: 6px; }
+  
+  /* Toolbar adjustments for smaller screens - more compact and fixed position */
+  .side-toolbar { left: 4px; width: 40px; padding: 4px; gap: 4px; top: 20px; transform: none; }
+  .side-toolbar.collapsed { left: 4px; }
+  .side-toolbar.expanded { left: 4px; }
+}
+
+@media (max-width: 480px) {
+  /* buttons rules moved to css/buttons.css */
+  
+  .client-selector { flex-direction: column; align-items: stretch; }
+  .client-selector label { min-width: 100%; }
+  .client-selector select { max-width: 100%; }
+  
+  /* Smaller toolbar on very small screens - adjust vertical position */
+  .side-toolbar { width: 36px; padding: 3px; gap: 3px; left: 2px; top: 10px; transform: none; }
+  .side-toolbar.collapsed { left: 2px; }
+  .side-toolbar.expanded { left: 2px; }
+}
+
+/* Soft loading overlay shown while fetching data from Google Sheets */
+.soft-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0;
+  z-index: 10030;
+  pointer-events: none; /* keep it soft — don't block clicks */
+}
+
+.soft-loading-box {
+  background: rgba(255,255,255,0.97);
+  color: #111827;
+  padding: 16px 20px;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  pointer-events: auto; /* allow interaction with message if necessary */
+  min-width: 260px;
+  max-width: calc(100% - 48px);
+  flex-direction: column;
+  text-align: center;
+}
+
+.soft-spinner {
+  width: 32px; height: 32px; border-radius: 50%; border: 4px solid rgba(0,0,0,0.08); border-top-color: #059669; animation: spin 0.8s linear infinite;
+  margin-top: 8px;
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.soft-loading-message { font-weight: 700; color: #0f172a; font-size: 15px; }
+
+/* Invoice Details Accordion */
+.client-section-header {
+  cursor: pointer;
+  height: 20px;
+}
+
+.client-section-header:hover {
+  cursor: pointer;
+}
+
+.client-section-title {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;
+  font-weight: 600;
+  color: #374151;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.fold-icon {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.section-status {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.client-section-content {
+  max-height: 1000px;
+  overflow: hidden;
+  opacity: 1;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  padding-top: 8px;
+}
+
+.client-section-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  overflow: hidden;
+}
+
+/* Rotate fold icon when collapsed */
+   
+/* Tooltip shown when cloning invoice number */
+.invoice-number-tooltip {
+  /* Use fixed positioning so the tooltip is positioned relative to the viewport and
+     avoids being trapped inside any transformed stacking context */
+  position: fixed !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  min-width: 0;
+  /* Ensure tooltip never runs under the scrollbar on the right by limiting width
+     relative to viewport width and giving a small safe margin */
+  max-width: calc(100vw - 64px) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  background: #059669 !important;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 10001 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  animation: fadeInUp 0.3s ease;
+  pointer-events: none;
+}
+
+/* Hide during printing */
+@media print { .invoice-number-tooltip { display: none !important; } }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

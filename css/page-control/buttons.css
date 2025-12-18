@@ -1,0 +1,172 @@
+/* buttons.css — global button styles used across the app */
+.buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  text-align: center;
+  font-family: inherit;
+}
+
+/* Button styles within .buttons container */
+.buttons button {
+  background: var(--btn-primary);
+  color: var(--btn-color);
+  flex: 1;
+  min-width: 105px;
+  max-width: 200px;
+  height: 31px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+
+/* Utility button classes used throughout templates and JS */
+.btn {
+  color: var(--btn-color);
+  margin: 5px 5px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.buttons button:hover { background: var(--btn-primary-hover, #047857); box-shadow: 0 2px 4px rgba(0,0,0,0.12); }
+.buttons button:active { background: var(--btn-primary-active, #047857); transform: translateY(1px); }
+.buttons button:disabled { background: var(--btn-disabled-bg, #a7f3d0); cursor: not-allowed; opacity: 0.4; }
+/* shared semantic color classes */ 
+.btn-primary { background: var(--btn-primary, #059669);  }
+.btn-danger { background: var(--btn-danger, #dc2626);  font-weight: 600; padding: 10px; }
+.btn-danger:hover { background: var(--btn-danger-hover, #b91c1c);  }
+.btn-flush { background: var(--btn-flush, #f59e0b);  }
+.btn-payment { background: var(--btn-payment)! important;  }
+
+.prev-btn, .next-btn, .nav-index { background: var(--btn-utility-bg); padding: 5px }
+.nav-index { background: transparent; color: var(--text-color); padding: 5px }
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-color, #374151);
+  margin-left: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.save-client-btn { margin:5px; background: var(--btn-primary, #059669);  font-weight: 600; }
+
+
+/* layout helpers */
+.w-100 { width: 100%; }
+.hidden { display: none !important; }
+
+/* additional utilities */
+.btn-success { margin:5px; background: var(--btn-success); padding: 10px; color: var(--btn-color); cursor: pointer; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; transition: all 0.2s ease; }
+.btn-append {
+    background: var(--btn-append, #06b6d4);
+    padding: 10px;
+    color: var(--btn-color);
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-export { color: var(--text-color, #374151);
+  background: var(--btn-append); color: white; cursor: pointer; border: 1px solid var(--text-color, #374151); padding: 6px 10px; border-radius: 4px; font-size: 12px; transition: all 0.2s ease; }
+.flex-1 { flex: 1; }
+/* buttons.css — global button styles used across the app */
+
+
+/* Toolbar buttons (small square buttons used in the side toolbar) */
+.toolbar-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--btn-color, #fff);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.toolbar-toggle { width:34px;height:26px;border-radius:6px;border:none;background:rgba(255,255,255,0.06);color:#fff;cursor:pointer; font-size:12px; pointer-events:auto; display:flex; align-items:center; justify-content:center; }
+.toolbar-toggle i { font-size: 14px; color: #fff; display: inline-block; line-height: 1; transition: transform 160ms ease; }
+.toolbar-btn:hover { background: rgba(255,255,255,0.06); }
+
+/* success checkmark for toolbar */
+.toolbar-btn.loaded { position: relative; }
+.toolbar-btn.loaded::after {
+  content: "\2713";
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  background: #16a34a;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* responsive tweaks for buttons and toolbar buttons */
+@media (max-width: 768px) {
+  .buttons { gap: 6px; margin-bottom: 8px; }
+  .buttons > * { min-width: 90px; max-width: 150px; font-size: 11px; }
+  .buttons button { min-width: 90px; max-width: 150px; height: 28px; padding: 6px 8px; font-size: 11px; }
+
+  .toolbar-btn { width: 30px; height: 30px; font-size: 13px; }
+  .toolbar-toggle { width: 30px; height: 24px; }
+  .toolbar-btn i { font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+  .buttons { flex-direction: column; gap: 4px; }
+  .buttons > * { min-width: 100%; max-width: 100%; }
+  .buttons button { min-width: 100%; max-width: 100%; height: 32px; }
+
+  .toolbar-btn { width: 28px; height: 28px; font-size: 12px; }
+  .toolbar-btn i { font-size: 14px; }
+}
+
+/* Utility button classes used throughout templates and JS */
+
+.btn-small { padding: 1px 1px; font-size: 5px; border-radius: 4px; }
+
+/* shared semantic color classes */
+
+.save-client-btn { background: var(--btn-primary, #059669);  font-weight: 600; }
+.cancel-btn {color: var(--btn-color);margin: 5px;  background: var(--btn-append, #6b7280);  border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease; }
+.cancel-btn:hover {background: var(--btn-cancel-hover, #4b5563); transform: translateY(-1px); }
+.action-btn { flex: 1; padding: 12px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.update-btn { background: linear-gradient(135deg,#f59e0b,#d97706);  }
+
+/* layout helpers */
+.w-100 { width: 100%; }
+.hidden { display: none !important; }
+

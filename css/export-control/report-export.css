@@ -1,0 +1,198 @@
+/* report-export.css — Styles for exported PDF reports */
+
+/* Container */
+.pdf-export-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: white;
+}
+
+/* Header Section */
+.pdf-export-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.pdf-export-title {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  color: #111827;
+}
+
+.pdf-export-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.pdf-export-meta-client {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Summary Table */
+.pdf-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 11px;
+}
+
+.pdf-summary-table thead {
+  background: #f3f4f6;
+}
+
+#export-invoice .items-table thead th,
+#export-invoice .items-table tbody td {
+  border: none; /* remove vertical borders */
+  padding: 10px 8px;
+  vertical-align: middle;
+  text-wrap: inherit; /* keep numbers centered vertically */
+}
+.pdf-summary-table th,
+.pdf-summary-table td {
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.pdf-summary-table th {
+  text-align: left;
+}
+
+.pdf-summary-table th.align-right,
+.pdf-summary-table td.align-right {
+  text-align: right;
+}
+
+.pdf-summary-table th.align-center,
+.pdf-summary-table td.align-center {
+  text-align: center;
+}
+
+.pdf-summary-table td.font-bold {
+  font-weight: bold;
+}
+
+/* Section Titles */
+.pdf-section-title {
+  font-size: 16px;
+  margin: 20px 0 10px 0;
+  color: #111827;
+}
+
+/* Client Summary Table */
+.pdf-client-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 10px;
+}
+
+.pdf-client-summary-table thead {
+  background: #f3f4f6;
+}
+
+.pdf-client-summary-table th,
+.pdf-client-summary-table td {
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.pdf-client-summary-table th {
+  text-align: left;
+}
+
+.pdf-client-summary-table th.align-center,
+.pdf-client-summary-table td.align-center {
+  text-align: center;
+}
+
+.pdf-client-summary-table th.align-right,
+.pdf-client-summary-table td.align-right {
+  text-align: right;
+}
+
+.pdf-client-summary-table tfoot {
+  background: #fafafa;
+  font-weight: bold;
+}
+
+/* Detail Table */
+.pdf-detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+}
+
+.pdf-detail-table thead {
+  background: #f3f4f6;
+}
+
+.pdf-detail-table th,
+.pdf-detail-table td {
+  padding: 5px;
+  border: 1px solid #e5e7eb;
+}
+
+.pdf-detail-table th {
+  text-align: left;
+}
+
+.pdf-detail-table th.align-right,
+.pdf-detail-table td.align-right {
+  text-align: right;
+}
+
+.pdf-detail-table tfoot {
+  background: #fafafa;
+  font-weight: bold;
+}
+
+.payment-details {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+/* Utility Classes */
+.export-payment-made,
+.export-remaining-balance {
+  background: var(--bg-muted, #feffff);
+  padding: 10px;
+  margin-bottom: 10px;
+
+  font-size: 12px;
+  width: 30%;
+  font-weight: bold;
+  display: flex;
+  justify-content: end !important
+}
+.export-payment-made div:first-child,
+.export-remaining-balance div:first-child {
+  margin-right: 20px;
+  text-align: left;
+  /*border: 1px solid red;*/
+
+}
+.export-payment-made div:nth-child(2),
+.export-remaining-balance div:nth-child(2) {
+  width: 70px;
+  text-align: left;
+ /* border: 1px solid red;*/
+  text-align: center;
+}
+  
+
+.export-notes-textarea {
+    margin-left: -8px;
+    width: 90%;
+    border: none;
+    font-size: 10px;
+    resize: vertical;
+    min-height: 40px;
+    background: var(--bg-surface, #fff);
+    font-family: var(--font-family);
+}

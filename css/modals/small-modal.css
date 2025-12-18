@@ -1,0 +1,6 @@
+/* small-modal.css — compact/small modal variant rules */
+
+.modal-overlay.small-modal .modal-content,
+.modal-overlay.small-modal .modal {
+  max-width: 480px;
+}
