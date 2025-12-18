@@ -1,0 +1,19 @@
+/* delete-invoice.css — Styles specific to the delete invoice modal layout */
+
+#deleteInvoiceModal[style*="display: block"],
+#deleteInvoiceModal[style*="display:block"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#deleteInvoiceModal .modal-content {
+  position: relative;
+  margin: auto;
+}
+
+#deleteInvoiceModal .modal-body > div:last-child {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #dc2626;
+}

@@ -1,0 +1,81 @@
+/* tables.css — items table, totals and general table styles */
+.items-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.items-table th { background: var(--bg-muted, #f8f9fa); padding: 7px; text-align: left; font-size: 10px; font-weight: bold; border: 1px solid var(--border-color, #dee2e6); }
+.items-table td { padding: 0px 6px; border: 1px solid var(--border-color, #dee2e6); font-size: 10px; vertical-align: middle; }
+
+.items-table input, .items-table textarea, .items-table select { width: 100%; padding: 3px; border: none; font-size: 10px; background: var(--bg-surface, #fff); }
+.items-table input[type="number"] { 
+  text-align: center; 
+  /* Hide number input spinners */
+  appearance: textfield;
+}
+.items-table input[type="number"]::-webkit-inner-spin-button,
+.items-table input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.items-table .desc-input {
+  width: 99%;
+  min-width: 150px;
+  max-width: 350px;
+  font-family: var(--font-family);
+  vertical-align: middle;
+  box-sizing: border-box;
+  padding: 8px 6px; /* center text vertically without fixed height */
+ /*overflow: hidden; /* prevent scrollbars */
+  /*resize: none; /* if textarea, disallow resize to keep sizing consistent */
+  line-height: 1.5;
+}
+.remove-btn { background: var(--btn-danger, #dc2626); color: var(--btn-danger-color-on, white); border: none; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 9px; }
+.add-line-btn { background: var(--btn-primary, #059669); color: var(--btn-primary-color-on, white); border: none; padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; margin-bottom: 12px; }
+
+.totals { width: 100%; margin-bottom: 20px; }
+.totals-row { display: flex; justify-content: flex-end; margin-bottom: 5px; font-size: 11px; }
+.totals-row.grand-total { font-weight: bold; font-size: 11px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border-color); }
+.totals-label { width: 120px; text-align: right; padding-right: 10px; }
+.totals-value { width: 90px; text-align: right; font-weight: bold; font-size: 11px; }
+
+#allInvoicesTable { width: 1800px; max-width: 100%; margin-top: 30px; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+#allInvoicesTable th, #allInvoicesTable td { border: 1px solid #bbb; padding: 6px; word-break: break-word; }
+#allInvoicesTable th { background: var(--bg-muted-2, #f1f1f1); }
+#allInvoicesTable th, #allInvoicesTable td { min-width: 90px; }
+#allInvoicesTable th:nth-child(7), #allInvoicesTable td:nth-child(7) { min-width: 160px; }
+#allInvoicesTable th:nth-child(10), #allInvoicesTable td:nth-child(10) { min-width: 160px; }
+#allInvoicesTable th:last-child, #allInvoicesTable td:last-child { min-width: 180px; }
+
+.taxable-amount, .tax-amount { font-size: 10px; }
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .items-table th { font-size: 9px; padding: 5px; }
+  .items-table td { font-size: 9px; padding: 4px; }
+  .items-table input, .items-table textarea, .items-table select { font-size: 9px; padding: 2px; }
+  .items-table .desc-input { min-width: 120px; max-width: 200px; padding: 6px 4px; }
+  .remove-btn { font-size: 8px; padding: 2px 4px; }
+  .add-line-btn { font-size: 10px; padding: 5px 8px; }
+  
+  .totals-row { font-size: 10px; }
+  .totals-row.grand-total { font-size: 12px; }
+  .totals-label { width: 100px; padding-right: 8px; }
+  .totals-value { width: 80px; }
+  
+  #allInvoicesTable { font-size: 11px; }
+  #allInvoicesTable th, #allInvoicesTable td { padding: 4px; min-width: 70px; }
+}
+
+@media (max-width: 480px) {
+  .items-table th { font-size: 8px; padding: 3px; }
+  .items-table td { font-size: 8px; padding: 3px; }
+  .items-table input, .items-table textarea, .items-table select { font-size: 8px; }
+  .items-table .desc-input { min-width: 100px; max-width: 150px; padding: 5px 4px; }
+  .remove-btn { font-size: 7px; padding: 1px 3px; }
+  .add-line-btn { font-size: 9px; padding: 4px 6px; }
+  
+  .totals-row { font-size: 9px; }
+  .totals-row.grand-total { font-size: 11px; }
+  .totals-label { width: 80px; font-size: 9px; }
+  .totals-value { width: 70px; }
+  
+  #allInvoicesTable { font-size: 10px; width: 100%; overflow-x: auto; }
+  #allInvoicesTable th, #allInvoicesTable td { padding: 3px; min-width: 60px; font-size: 9px; }
+}
